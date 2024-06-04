@@ -1,0 +1,1 @@
+solar-ginkgo build -r ${TESTSOLAR_WORKSPACE}

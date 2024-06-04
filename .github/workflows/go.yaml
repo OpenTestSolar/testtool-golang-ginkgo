@@ -1,0 +1,38 @@
+name: Go
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run Go Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        golang-version: ['1.20', '1.21', '1.22']
+
+    steps:
+    - name: Set up Go ${{ matrix.golang-version }}
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ matrix.golang-version }}
+
+    - name: Check out code
+      uses: actions/checkout@v4
+    - name: Install tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y upx 
+    - name: Get dependencies
+      run: |
+        cd ginkgo
+        go install github.com/onsi/ginkgo/v2/ginkgo
+        go mod download
+
+    - name: Run tests and check coverage
+      run: |
+        cd ginkgo
+        ./coverage.sh
