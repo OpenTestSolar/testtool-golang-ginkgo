@@ -15,5 +15,5 @@ func main() {
 	rootCmd.AddCommand(discover.NewCmdDiscover())
 	rootCmd.AddCommand(execute.NewCmdExecute())
 	rootCmd.AddCommand(build.NewCmdBuild())
-	rootCmd.Execute()
+	_ = rootCmd.Execute()
 }

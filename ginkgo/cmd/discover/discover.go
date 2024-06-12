@@ -18,23 +18,23 @@ type DiscoverOptions struct {
 	discoverPath string
 }
 
-// NewBuildOptions new build options with default value
+// NewDiscoverOptions NewBuildOptions new build options with default value
 func NewDiscoverOptions() *DiscoverOptions {
 	return &DiscoverOptions{}
 }
 
-// NewCmdBuild create a build command
+// NewCmdDiscover NewCmdBuild create a build command
 func NewCmdDiscover() *cobra.Command {
 	o := NewDiscoverOptions()
 	cmd := cobra.Command{
 		Use:   "discover",
 		Short: "Discover testcases",
-		Run: func(cmd *cobra.Command, args []string) {
-			o.RunDiscover(cmd)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return o.RunDiscover(cmd)
 		},
 	}
 	cmd.Flags().StringVarP(&o.discoverPath, "path", "p", "", "Path of testcase info")
-	cmd.MarkFlagRequired("path")
+	_ = cmd.MarkFlagRequired("path")
 	return &cmd
 }
 

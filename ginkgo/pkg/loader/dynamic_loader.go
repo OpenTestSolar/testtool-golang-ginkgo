@@ -217,7 +217,7 @@ func dynamicLoadTestcase(projPath string, selectorPath string) ([]*ginkgoTestcas
 
 func getAvailableSuitePath(projPath, rootPath string) []string {
 	var packageList []string
-	filepath.Walk(rootPath, func(path string, fi os.FileInfo, _ error) error {
+	err := filepath.Walk(rootPath, func(path string, fi os.FileInfo, _ error) error {
 		if strings.HasSuffix(path, "_suite_test.go") {
 			packagePath := filepath.Dir(path)
 			if packagePath == projPath {
@@ -231,6 +231,10 @@ func getAvailableSuitePath(projPath, rootPath string) []string {
 		}
 		return nil
 	})
+	if err != nil {
+		log.Printf("get available suite path failed: %v", err)
+		return nil
+	}
 	return packageList
 }
 

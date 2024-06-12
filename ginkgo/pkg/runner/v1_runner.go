@@ -22,7 +22,7 @@ func RunGinkgoV1Test(projPath string, pkgBin string, filepath string, tcNames []
 	log.Printf("Run cmdline %s", cmdline)
 	startTime := time.Now()
 	_, stderr, err := ginkgoUtil.RunCommandWithOutput(cmdline, projPath)
-	delta := time.Now().Sub(startTime)
+	delta := time.Since(startTime)
 	log.Printf("Run test command cost %.2fs", delta.Seconds())
 	if err != nil {
 		log.Printf("Command exit code: %v", err)

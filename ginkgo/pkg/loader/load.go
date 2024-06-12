@@ -27,7 +27,7 @@ func LoadTestCase(projPath string, selectorPath string) ([]*ginkgoTestcase.TestC
 			}
 			testcaseList = append(testcaseList, loadedTestCases...)
 		} else {
-			filepath.Walk(selectorAbsPath, func(path string, fi os.FileInfo, _ error) error {
+			err := filepath.Walk(selectorAbsPath, func(path string, fi os.FileInfo, _ error) error {
 				loadedTestCases, err := ParseTestCaseInFile(projPath, path)
 				if err != nil {
 					log.Printf("Static parse testcase within path %s failed, err: %v", path, err)
@@ -36,6 +36,9 @@ func LoadTestCase(projPath string, selectorPath string) ([]*ginkgoTestcase.TestC
 				testcaseList = append(testcaseList, loadedTestCases...)
 				return nil
 			})
+			if err != nil {
+				return nil, err
+			}
 		}
 	} else {
 		if parseMode == "dynamic" {

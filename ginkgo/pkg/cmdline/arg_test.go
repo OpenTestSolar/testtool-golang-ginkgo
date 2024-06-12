@@ -25,11 +25,11 @@ func TestNewCmdArgsParseByCmdLine(t *testing.T) {
 	assert.Equal(t, len(ca.Args), 3)
 	// 测试无效输入
 	cmdline = ""
-	ca, err = NewCmdArgsParseByCmdLine(cmdline)
+	_, err = NewCmdArgsParseByCmdLine(cmdline)
 	assert.Error(t, err)
 	// 测试错误情况（例如，输入包含无法解析的引号）
 	cmdline = "ginkgo \"arg with unclosed quote"
-	ca, err = NewCmdArgsParseByCmdLine(cmdline)
+	_, err = NewCmdArgsParseByCmdLine(cmdline)
 	assert.Error(t, err)
 }
 
