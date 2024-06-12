@@ -29,19 +29,19 @@ func TestIsJsonFileEmpty(t *testing.T) {
 	// 创建一个临时目录来存放测试文件
 	tempDir := t.TempDir()
 	emptyJsonFile := filepath.Join(tempDir, "empty.json")
-	os.WriteFile(emptyJsonFile, []byte("{}"), 0644)
+	_ = os.WriteFile(emptyJsonFile, []byte("{}"), 0644)
 
 	// 创建一个非空的JSON对象文件
 	nonEmptyObjectFile := filepath.Join(tempDir, "nonempty_object.json")
-	os.WriteFile(nonEmptyObjectFile, []byte(`{"key": "value"}`), 0644)
+	_ = os.WriteFile(nonEmptyObjectFile, []byte(`{"key": "value"}`), 0644)
 
 	// 创建一个非空的JSON数组文件
 	nonEmptyArrayFile := filepath.Join(tempDir, "nonempty_array.json")
-	os.WriteFile(nonEmptyArrayFile, []byte(`[1, 2, 3]`), 0644)
+	_ = os.WriteFile(nonEmptyArrayFile, []byte(`[1, 2, 3]`), 0644)
 
 	// 创建一个非JSON文件
 	nonJsonFile := filepath.Join(tempDir, "nonjson.txt")
-	os.WriteFile(nonJsonFile, []byte("This is not JSON."), 0644)
+	_ = os.WriteFile(nonJsonFile, []byte("This is not JSON."), 0644)
 
 	// 测试用例
 	testCases := []struct {

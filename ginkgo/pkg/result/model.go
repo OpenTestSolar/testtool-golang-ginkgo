@@ -40,10 +40,7 @@ type ReportEntry struct {
 }
 
 func (e *ReportEntry) isValidEntry() bool {
-	if e.Name != "By Step" {
-		return false
-	}
-	return true
+	return e.Name == "By Step"
 }
 
 type FailureLocation struct {

@@ -25,7 +25,7 @@ const (
 
 func Build(projPath string) error {
 	var packageList []string
-	filepath.Walk(projPath, func(path string, fi os.FileInfo, _ error) error {
+	err := filepath.Walk(projPath, func(path string, fi os.FileInfo, _ error) error {
 		if strings.HasSuffix(path, "_suite_test.go") {
 			packagePath := filepath.Dir(path)
 			if packagePath == projPath {
@@ -39,10 +39,13 @@ func Build(projPath string) error {
 		}
 		return nil
 	})
+	if err != nil {
+		return err
+	}
 
 	concBuild, _ := strconv.ParseBool(os.Getenv("TESTSOlAR_TTP_CONCURRENTBUILD"))
 	concurrencyLevel := 1
-	if concBuild == true {
+	if concBuild {
 		log.Printf("enable concurrent building package")
 		if runtime.GOMAXPROCS(0)+2 > MaxBuildConcurrency {
 			concurrencyLevel = MaxBuildConcurrency
@@ -60,7 +63,7 @@ func Build(projPath string) error {
 			return buildAndCompressTestBin(projPath, packagePath, compress)
 		})
 	}
-	err := p.Wait()
+	err = p.Wait()
 	if err != nil {
 		return fmt.Errorf("build package failed, err: %s", err.Error())
 	}

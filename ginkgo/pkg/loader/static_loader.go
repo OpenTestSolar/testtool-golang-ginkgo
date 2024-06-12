@@ -147,9 +147,9 @@ func ParseTestCaseInFile(projPath string, path string) ([]*ginkgoTestcase.TestCa
 			} else if declType.Tok == token.VAR {
 				for _, spec := range declType.Specs {
 					for _, value := range spec.(*ast.ValueSpec).Values {
-						switch value.(type) {
+						switch value := value.(type) {
 						case *ast.CallExpr:
-							spec, err := parseTestCaseSpec(value.(*ast.CallExpr))
+							spec, err := parseTestCaseSpec(value)
 							if err != nil {
 								log.Printf("Parse ginkgo testcase failed: %v", err)
 								continue

@@ -21,23 +21,23 @@ type ExecuteOptions struct {
 	executePath string
 }
 
-// NewBuildOptions new build options with default value
+// NewExecuteOptions NewBuildOptions new build options with default value
 func NewExecuteOptions() *ExecuteOptions {
 	return &ExecuteOptions{}
 }
 
-// NewCmdBuild create a build command
+// NewCmdExecute NewCmdBuild create a build command
 func NewCmdExecute() *cobra.Command {
 	o := NewExecuteOptions()
 	cmd := cobra.Command{
 		Use:   "execute",
 		Short: "Execute testcases",
-		Run: func(cmd *cobra.Command, args []string) {
-			o.RunExecute(cmd)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return o.RunExecute(cmd)
 		},
 	}
 	cmd.Flags().StringVarP(&o.executePath, "path", "p", "", "Path of testcase info")
-	cmd.MarkFlagRequired("path")
+	_ = cmd.MarkFlagRequired("path")
 	return &cmd
 }
 

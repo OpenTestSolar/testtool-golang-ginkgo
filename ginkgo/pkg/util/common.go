@@ -29,7 +29,7 @@ func ElementIsInSlice(element string, elements []string) bool {
 	return false
 }
 
-// 根据给定路径返回路径对应的目录以及文件名，若路径指向目录则仅返回目录，若路径指向文件则返回文件对应目录以及文件名，如果路径不存在则返回错误
+// GetPathAndFileName 根据给定路径返回路径对应的目录以及文件名，若路径指向目录则仅返回目录，若路径指向文件则返回文件对应目录以及文件名，如果路径不存在则返回错误
 func GetPathAndFileName(projPath, path string) (dir string, file string, err error) {
 	if path == "" {
 		return "", "", errors.New("path is empty")
@@ -50,7 +50,7 @@ func GetPathAndFileName(projPath, path string) (dir string, file string, err err
 	}
 }
 
-// RemoveExistingResultFile 函数用于删除指定路径的文件，如果文件存在的话。
+// RemoveFile 函数用于删除指定路径的文件，如果文件存在的话。
 // 参数:
 //
 //	filePath: 要删除的文件的路径
@@ -89,13 +89,13 @@ func IsJsonFileEmpty(path string) (bool, error) {
 		return false, err
 	}
 
-	switch v.(type) {
+	switch v := v.(type) {
 	case map[string]interface{}:
-		if len(v.(map[string]interface{})) == 0 {
+		if len(v) == 0 {
 			return true, nil
 		}
 	case []interface{}:
-		if len(v.([]interface{})) == 0 {
+		if len(v) == 0 {
 			return true, nil
 		}
 	}

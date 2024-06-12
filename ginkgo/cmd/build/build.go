@@ -21,12 +21,12 @@ func NewCmdBuild() *cobra.Command {
 	cmd := cobra.Command{
 		Use:   "build",
 		Short: "Build testcase",
-		Run: func(cmd *cobra.Command, args []string) {
-			o.RunBuild(cmd, args)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return o.RunBuild(cmd, args)
 		},
 	}
 	cmd.Flags().StringVarP(&o.projPath, "root", "r", "", "Project root path")
-	cmd.MarkFlagRequired("root")
+	_ = cmd.MarkFlagRequired("root")
 	return &cmd
 }
 

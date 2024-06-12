@@ -9,7 +9,7 @@ import (
 func GetGinkgoVersion(testcases []*ginkgoTestcase.TestCase) string {
 	version := "2"
 	for _, tc := range testcases {
-		version, _ = tc.Attributes["ginkgoVersion"]
+		version = tc.Attributes["ginkgoVersion"]
 	}
 	log.Printf("ginkgo version is %s", version)
 	return version
