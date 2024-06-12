@@ -1,0 +1,94 @@
+[
+    {
+      "SuitePath": "/data/workspace",
+      "SuiteDescription": "Suite",
+      "SuiteLabels": [],
+      "SuiteSucceeded": false,
+      "SuiteHasProgrammaticFocus": false,
+      "SpecialSuiteFailureReasons": [],
+      "PreRunStats": {
+        "TotalSpecs": 2,
+        "SpecsThatWillRun": 1
+      },
+      "StartTime": "2023-09-15T13:03:23.215869013+08:00",
+      "EndTime": "2023-09-15T13:21:06.378896358+08:00",
+      "RunTime": 1063163027345,
+      "SuiteConfig": {
+        "RandomSeed": 1694754202,
+        "RandomizeAllSpecs": false,
+        "FocusStrings": [
+          "$"
+        ],
+        "SkipStrings": null,
+        "FocusFiles": null,
+        "SkipFiles": null,
+        "LabelFilter": "",
+        "FailOnPending": false,
+        "FailFast": false,
+        "FlakeAttempts": 0,
+        "EmitSpecProgress": false,
+        "DryRun": false,
+        "Timeout": 17999999935151,
+        "OutputInterceptorMode": "",
+        "ParallelProcess": 1,
+        "ParallelTotal": 10,
+        "ParallelHost": "127.0.0.1:41035"
+      },
+      "SpecReports": [
+        {
+          "ContainerHierarchyTexts": null,
+          "ContainerHierarchyLocations": null,
+          "ContainerHierarchyLabels": null,
+          "LeafNodeType": "SynchronizedBeforeSuite",
+          "LeafNodeLocation": {
+            "FileName": "/data/workspace/suites/demo/demo_suite_test.go",
+            "LineNumber": 35
+          },
+          "LeafNodeLabels": null,
+          "LeafNodeText": "",
+          "State": "panicked",
+          "StartTime": "2023-09-15T13:03:25.8163497+08:00",
+          "EndTime": "2023-09-15T13:21:06.306824618+08:00",
+          "RunTime": 1060490474914,
+          "ParallelProcess": 1,
+          "Failure": {
+            "Message": "Test Panicked",
+            "Location": {
+              "FileName": "/data/workspace/suites/demo/demo_suite_test.go",
+              "LineNumber": 121,
+              "FullStackTrace": ""
+            },
+            "ForwardedPanic": "Failed",
+            "FailureNodeContext": "leaf-node",
+            "FailureNodeType": "SynchronizedBeforeSuite",
+            "FailureNodeLocation": {
+              "FileName": "/data/workspace/suites/demo/demo_suite_test.go",
+              "LineNumber": 35
+            },
+            "FailureNodeContainerIndex": 0
+          },
+          "NumAttempts": 0,
+          "CapturedStdOutErr": "err"
+        },
+        {
+          "ContainerHierarchyTexts": null,
+          "ContainerHierarchyLocations": null,
+          "ContainerHierarchyLabels": null,
+          "LeafNodeType": "SynchronizedAfterSuite",
+          "LeafNodeLocation": {
+            "FileName": "/data/workspace/suites/demo/demo_suite_test.go",
+            "LineNumber": 61
+          },
+          "LeafNodeLabels": null,
+          "LeafNodeText": "",
+          "State": "passed",
+          "StartTime": "2023-09-15T13:21:06.307380592+08:00",
+          "EndTime": "2023-09-15T13:21:06.378438451+08:00",
+          "RunTime": 71057839,
+          "ParallelProcess": 1,
+          "NumAttempts": 0,
+          "CapturedStdOutErr": "err"
+        }
+      ]
+    }
+  ]
