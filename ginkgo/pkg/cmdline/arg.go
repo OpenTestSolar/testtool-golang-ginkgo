@@ -3,6 +3,8 @@ package cmdline
 import (
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/google/shlex"
@@ -104,6 +106,21 @@ func (ca *CommandArgs) AddOrReplaceArgs(args []*CommandArg) {
 	}
 }
 
+func (ca *CommandArgs) AddIfNotExists(args []*CommandArg) {
+	for _, arg := range args {
+		var exits bool
+		for _, a := range ca.Args {
+			if a.Key == arg.Key {
+				exits = true
+				break
+			}
+		}
+		if !exits {
+			ca.Args = append(ca.Args, arg)
+		}
+	}
+}
+
 func (ca *CommandArgs) Merge(mergedCmdArgs *CommandArgs) {
 	ca.AddOrReplaceArgs(mergedCmdArgs.Args)
 }
@@ -113,6 +130,8 @@ func (ca *CommandArgs) GenerateCmdLineStr() string {
 	for _, arg := range ca.Args {
 		if arg.Value == "" {
 			cmdLineItems = append(cmdLineItems, arg.Key)
+		} else if arg.Key == "" {
+			cmdLineItems = append(cmdLineItems, arg.Value)
 		} else {
 			tmp := strings.Join([]string{arg.Key, arg.Value}, " ")
 			cmdLineItems = append(cmdLineItems, tmp)
@@ -123,10 +142,9 @@ func (ca *CommandArgs) GenerateCmdLineStr() string {
 }
 
 func (ca *CommandArgs) NeedFocus() bool {
-	for _, arg := range ca.Args {
-		if strings.HasPrefix(arg.Key, "--focus") || strings.HasPrefix(arg.Key, "--skip") || strings.HasSuffix(arg.Key, "label-filter") {
-			return false
-		}
+	if ok, err := strconv.ParseBool(os.Getenv("TESTSOLAR_TTP_FOCUS")); err != nil {
+		return true
+	} else {
+		return ok
 	}
-	return true
 }

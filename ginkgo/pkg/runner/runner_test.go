@@ -21,7 +21,8 @@ func TestGenarateCommandLine(t *testing.T) {
 		"case01",
 		"case02",
 	}
-	expected := `ginkgo --v --no-color --trace --json-report "output.json" --output-dir "/data/workspace" --always-emit-ginkgo-writer --procs "3" --timeout "5h" --focus "case" --label-filter "( label01||label02)" -p suite.test`
+	os.Setenv("TESTSOLAR_TTP_FOCUS", "true")
+	expected := `ginkgo --v --no-color --trace --json-report "output.json" --output-dir "/data/workspace" --always-emit-ginkgo-writer --procs "3" --timeout "5h" --focus "case" --label-filter "( label01||label02)" suite.test`
 	cmdline := genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin, tcNames, true)
 	assert.Equal(t, expected, cmdline, "should return the expected command line")
 }
@@ -40,7 +41,7 @@ func Test_obtainExpectedExecuteCases(t *testing.T) {
 	err = os.Setenv("TESTSOLAR_TTP_EXTRAARGS", "1")
 	assert.NoError(t, err)
 	expectedCases := obtainExpectedExecuteCasesByDryRun(projPath, cmdline)
-	assert.Len(t, expectedCases, 3)
+	assert.Len(t, expectedCases, 4)
 }
 
 func Test_getExpectedCases(t *testing.T) {
@@ -57,7 +58,7 @@ func Test_getExpectedCases(t *testing.T) {
 	err = os.Setenv("TESTSOLAR_TTP_EXTRAARGS", "1")
 	assert.NoError(t, err)
 	expectedCases := getExpectedCases(cmdline, projPath, "tests/ginkgo/demo/demo_test.go", "tests/ginkgo/demo", []string{})
-	assert.Len(t, expectedCases, 3)
+	assert.Len(t, expectedCases, 4)
 }
 
 func Test_convertExpectedCasesToFailedCases(t *testing.T) {

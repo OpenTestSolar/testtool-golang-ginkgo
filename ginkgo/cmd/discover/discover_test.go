@@ -4,9 +4,11 @@ import (
 	"ginkgo/pkg/loader"
 	"ginkgo/pkg/selector"
 	"ginkgo/pkg/testcase"
+	ginkgoTestcase "ginkgo/pkg/testcase"
 	"path/filepath"
 	"testing"
 
+	"github.com/OpenTestSolar/testtool-sdk-golang/api"
 	sdkApi "github.com/OpenTestSolar/testtool-sdk-golang/api"
 	sdkClient "github.com/OpenTestSolar/testtool-sdk-golang/client"
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
@@ -54,7 +56,13 @@ func TestReportTestcases(t *testing.T) {
 			Attributes: map[string]string{},
 		},
 	}
-	err := reportTestcases(testcases)
+	loadErrors := []*sdkModel.LoadError{
+		{
+			Name:    "",
+			Message: "",
+		},
+	}
+	err := reportTestcases(testcases, loadErrors, &MockReporterClient{})
 	assert.NoError(t, err)
 }
 
@@ -85,6 +93,40 @@ func TestLoadTestcases(t *testing.T) {
 	}
 	projPath, err := filepath.Abs("../../testdata")
 	assert.NoError(t, err)
-	testcases := loadTestcases(projPath, testSelectors)
+	testcases, loadErrors := loadTestcases(projPath, testSelectors)
 	assert.Len(t, testcases, 1)
+	assert.Len(t, loadErrors, 0)
+}
+
+func TestRunDiscover(t *testing.T) {
+	reportTestcasesMock := gomonkey.ApplyFunc(reportTestcases, func(testcases []*ginkgoTestcase.TestCase, loadErrors []*sdkModel.LoadError, reporter api.Reporter) error {
+		return nil
+	})
+	defer reportTestcasesMock.Reset()
+	projPath, err := filepath.Abs("../../testdata")
+	assert.NoError(t, err)
+	UnmarshalCaseInfoMock := gomonkey.ApplyFunc(ginkgoTestcase.UnmarshalCaseInfo, func(path string) (*sdkModel.EntryParam, error) {
+		return &sdkModel.EntryParam{
+			TestSelectors: []string{
+				"path/to/test?test01",
+			},
+			ProjectPath:    projPath,
+			FileReportPath: projPath,
+		}, nil
+	})
+	defer UnmarshalCaseInfoMock.Reset()
+	LoadTestCaseMock := gomonkey.ApplyFunc(loader.LoadTestCase, func(projPath string, selectorPath string) ([]*testcase.TestCase, error) {
+		return []*testcase.TestCase{
+			{
+				Path:       "path/to/test",
+				Name:       "test01",
+				Attributes: map[string]string{},
+			},
+		}, nil
+	})
+	defer LoadTestCaseMock.Reset()
+	o := NewDiscoverOptions()
+	cmd := NewCmdDiscover()
+	err = o.RunDiscover(cmd)
+	assert.NoError(t, err)
 }

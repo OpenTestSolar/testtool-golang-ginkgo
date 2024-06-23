@@ -1,6 +1,7 @@
 package execute
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -58,7 +59,7 @@ func TestReportTestResults(t *testing.T) {
 			Steps:      []*sdkModel.TestCaseStep{},
 		},
 	}
-	err := reportTestResults(testResults)
+	err := reportTestResults(testResults, &MockReporterClient{})
 	if err != nil {
 		t.Errorf("reportTestResults failed: %v", err)
 	}
@@ -135,4 +136,45 @@ func TestExecuteTestcases(t *testing.T) {
 	results, err := executeTestcases(projPath, packages)
 	assert.NoError(t, err)
 	assert.Len(t, results, 3)
+}
+
+func Test_discoverExecutableTestcases(t *testing.T) {
+	projPath, err := filepath.Abs("../../testdata")
+	assert.NoError(t, err)
+	err = os.Chdir(projPath)
+	assert.NoError(t, err)
+	// 验证可以基于指定目录路径找到路径下对应的所有包含测试用例的子目录
+	testcases := []*testcase.TestCase{
+		{
+			Path: "demo",
+			Name: "",
+		},
+	}
+	execTestcases, err := discoverExecutableTestcases(testcases)
+	assert.NoError(t, err)
+	assert.Len(t, execTestcases, 2)
+	// 验证如果传入的是文件路径则直接返回
+	testcases = []*testcase.TestCase{
+		{
+			Path: "demo/demo_test.go",
+			Name: "",
+		},
+		{
+			Path: "demo/book/book_test.go",
+			Name: "",
+		},
+	}
+	execTestcases, err = discoverExecutableTestcases(testcases)
+	assert.NoError(t, err)
+	assert.Len(t, execTestcases, 2)
+	// 验证如果传入的已经是子目录则不会返回额外用例
+	testcases = []*testcase.TestCase{
+		{
+			Path: "demo/book",
+			Name: "",
+		},
+	}
+	execTestcases, err = discoverExecutableTestcases(testcases)
+	assert.NoError(t, err)
+	assert.Len(t, execTestcases, 1)
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
@@ -119,4 +120,14 @@ func GetWorkspace(path string) string {
 		projPath = os.Getenv("TESTSOLAR_WORKSPACE")
 	}
 	return strings.TrimSuffix(projPath, string(os.PathSeparator))
+}
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+func GenRandomString(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
 }

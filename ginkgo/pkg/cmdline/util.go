@@ -2,9 +2,7 @@ package cmdline
 
 import (
 	"log"
-	"os"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -25,9 +23,7 @@ func removeTestCaseLabels(tcNames []string) []string {
 
 func GenTestCaseFocusName(tcNames []string) string {
 	// 传入的用例名中可能包含用例标签，ginkgo focus参数中只能识别用例名，因此需要去除
-	if remove, _ := strconv.ParseBool(os.Getenv("TESTSOLAR_TTP_WITHLABELS")); remove {
-		tcNames = removeTestCaseLabels(tcNames)
-	}
+	tcNames = removeTestCaseLabels(tcNames)
 	name := strings.Join(tcNames, "|")
 	name = strings.Replace(name, "/", " ", -1)
 	name = strings.Replace(name, "[", "\\[", -1)

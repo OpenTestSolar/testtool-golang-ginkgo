@@ -6,56 +6,50 @@ import (
 	"path/filepath"
 
 	ginkgoTestcase "ginkgo/pkg/testcase"
+
+	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 )
 
-func LoadTestCase(projPath string, selectorPath string) ([]*ginkgoTestcase.TestCase, error) {
+func LoadTestCase(projPath string, selectorPath string) ([]*ginkgoTestcase.TestCase, []*sdkModel.LoadError) {
 	var testcaseList []*ginkgoTestcase.TestCase
+	var loadErrors []*sdkModel.LoadError
 	selectorAbsPath := filepath.Join(projPath, selectorPath)
 	fi, err := os.Stat(selectorAbsPath)
 	if err != nil {
-		log.Printf("stat selector abs path: %s failed, err: %s", selectorAbsPath, err.Error())
-		return testcaseList, err
+		loadErrors = append(loadErrors, &sdkModel.LoadError{
+			Name:    selectorPath,
+			Message: err.Error(),
+		})
+		return nil, loadErrors
 	}
 	parseMode := os.Getenv("TESTSOLAR_TTP_PARSEMODE")
 	log.Printf("Try to load testcases from path %s, parse mode: %s", selectorAbsPath, parseMode)
 	if fi.IsDir() {
 		if parseMode == "dynamic" {
-			loadedTestCases, err := DynamicLoadTestcaseInDir(projPath, selectorAbsPath)
-			if err != nil {
-				log.Printf("dynamic load testcase from dir failed: %v", err)
-				return testcaseList, err
-			}
+			loadedTestCases, lErrors := DynamicLoadTestcaseInDir(projPath, selectorAbsPath)
 			testcaseList = append(testcaseList, loadedTestCases...)
+			loadErrors = append(loadErrors, lErrors...)
 		} else {
 			err := filepath.Walk(selectorAbsPath, func(path string, fi os.FileInfo, _ error) error {
-				loadedTestCases, err := ParseTestCaseInFile(projPath, path)
-				if err != nil {
-					log.Printf("Static parse testcase within path %s failed, err: %v", path, err)
-					return nil
-				}
+				loadedTestCases, lErrors := ParseTestCaseInFile(projPath, path)
 				testcaseList = append(testcaseList, loadedTestCases...)
+				loadErrors = append(loadErrors, lErrors...)
 				return nil
 			})
 			if err != nil {
-				return nil, err
+				log.Printf("Failed to load testcases from %s, err: %s", selectorAbsPath, err)
 			}
 		}
 	} else {
 		if parseMode == "dynamic" {
-			loadedTestCases, err := DynamicLoadTestcaseInFile(projPath, selectorAbsPath)
-			if err != nil {
-				log.Printf("dynamic load testcase in faile %s failed, err: %v", selectorAbsPath, err)
-				return testcaseList, err
-			}
+			loadedTestCases, lErrors := DynamicLoadTestcaseInFile(projPath, selectorAbsPath)
 			testcaseList = append(testcaseList, loadedTestCases...)
+			loadErrors = append(loadErrors, lErrors...)
 		} else {
-			loadedTestCases, err := ParseTestCaseInFile(projPath, selectorAbsPath)
-			if err != nil {
-				log.Printf("Parse testcase file %s failed, err: %v", selectorAbsPath, err)
-				return testcaseList, err
-			}
+			loadedTestCases, lErrors := ParseTestCaseInFile(projPath, selectorAbsPath)
 			testcaseList = append(testcaseList, loadedTestCases...)
+			loadErrors = append(loadErrors, lErrors...)
 		}
 	}
-	return testcaseList, nil
+	return testcaseList, loadErrors
 }
