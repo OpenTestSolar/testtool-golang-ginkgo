@@ -54,7 +54,13 @@ func TestReportTestcases(t *testing.T) {
 			Attributes: map[string]string{},
 		},
 	}
-	err := reportTestcases(testcases)
+	loadErrors := []*sdkModel.LoadError{
+		{
+			Name:    "",
+			Message: "",
+		},
+	}
+	err := reportTestcases(testcases, loadErrors, &MockReporterClient{})
 	assert.NoError(t, err)
 }
 
@@ -85,6 +91,7 @@ func TestLoadTestcases(t *testing.T) {
 	}
 	projPath, err := filepath.Abs("../../testdata")
 	assert.NoError(t, err)
-	testcases := loadTestcases(projPath, testSelectors)
+	testcases, loadErrors := loadTestcases(projPath, testSelectors)
 	assert.Len(t, testcases, 1)
+	assert.Len(t, loadErrors, 0)
 }

@@ -2,18 +2,20 @@ package execute
 
 import (
 	"errors"
-	"fmt"
 	ginkgoBuilder "ginkgo/pkg/builder"
 	ginkgoRunner "ginkgo/pkg/runner"
 	ginkgoTestcase "ginkgo/pkg/testcase"
 	ginkgoUtil "ginkgo/pkg/util"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/OpenTestSolar/testtool-sdk-golang/api"
 	sdkClient "github.com/OpenTestSolar/testtool-sdk-golang/client"
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
+	pkgErrors "github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -63,41 +65,87 @@ func groupTestCasesByPathAndName(projPath string, testcases []*ginkgoTestcase.Te
 	return packages, nil
 }
 
-func reportTestResults(testResults []*sdkModel.TestResult) error {
-	reporter, err := sdkClient.NewReporterClient()
-	if err != nil {
-		fmt.Printf("Failed to create reporter: %v\n", err)
-		return err
-	}
+func reportTestResults(testResults []*sdkModel.TestResult, reporter api.Reporter) error {
 	for _, result := range testResults {
-		err = reporter.ReportCaseResult(result)
+		err := reporter.ReportCaseResult(result)
 		if err != nil {
-			fmt.Printf("Failed to report load result: %v\n", err)
-			return err
+			return pkgErrors.Wrap(err, "failed to report load result")
 		}
 	}
-	err = reporter.Close()
-	if err != nil {
-		fmt.Printf("Failed to close report: %v\n", err)
-		return err
-	}
 	return nil
+}
+
+func findTestPackagesByPath(path string) ([]string, error) {
+	subDirs := []string{}
+	foundSubDirs := map[string]bool{}
+	err := filepath.WalkDir(path, func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return pkgErrors.Wrapf(err, "walk subdir %s failed", p)
+		}
+		if !d.IsDir() && strings.HasSuffix(p, "_suite_test.go") {
+			subDir := filepath.Dir(p)
+			if _, ok := foundSubDirs[subDir]; !ok {
+				subDirs = append(subDirs, subDir)
+				foundSubDirs[subDir] = true
+			}
+			return nil
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, pkgErrors.Wrapf(err, "walk dir %s failed", path)
+	}
+	return subDirs, nil
+}
+
+func discoverExecutableTestcases(testcases []*ginkgoTestcase.TestCase) ([]*ginkgoTestcase.TestCase, error) {
+	excutableTestcases := []*ginkgoTestcase.TestCase{}
+	for _, testcase := range testcases {
+		fd, err := os.Stat(testcase.Path)
+		if err != nil {
+			return nil, pkgErrors.Wrapf(err, "get file info %s failed", testcase.Path)
+		}
+		if !fd.IsDir() {
+			excutableTestcases = append(excutableTestcases, testcase)
+			continue
+		}
+		packages, err := findTestPackagesByPath(testcase.Path)
+		if err != nil {
+			return nil, pkgErrors.Wrapf(err, "find packages in %s failed", testcase.Path)
+		}
+		if len(packages) == 0 {
+			return nil, pkgErrors.Wrapf(err, "failed to found available test packages in dir %s", testcase.Path)
+		}
+		for _, pack := range packages {
+			if pack != testcase.Path {
+				log.Printf("[PLUGIN]found test package %s in %s", pack, testcase.Path)
+			}
+			t := &ginkgoTestcase.TestCase{
+				Path:       pack,
+				Name:       testcase.Name,
+				Attributes: testcase.Attributes,
+			}
+			excutableTestcases = append(excutableTestcases, t)
+		}
+	}
+	return excutableTestcases, nil
 }
 
 func executeTestcases(projPath string, packages map[string]map[string][]*ginkgoTestcase.TestCase) ([]*sdkModel.TestResult, error) {
 	var testResults []*sdkModel.TestResult
 	for path, filesCases := range packages {
-		pkgBin := filepath.Join(projPath, path+".test")
-		_, err := os.Stat(pkgBin)
-		if err != nil {
-			log.Printf("Can't find package bin file %s during running, try to build it...", pkgBin)
-			_, err := ginkgoBuilder.BuildTestPackage(projPath, path, false)
-			if err != nil {
-				return nil, fmt.Errorf("Build package %s during running failed, err: %s", path, err.Error())
-			}
-		}
 		// test one suite each time
 		for filename, cases := range filesCases {
+			pkgBin := filepath.Join(projPath, path+".test")
+			_, err := os.Stat(pkgBin)
+			if err != nil {
+				log.Printf("Can't find package bin file %s during running, try to build it...", pkgBin)
+				_, err := ginkgoBuilder.BuildTestPackage(projPath, path, false)
+				if err != nil {
+					log.Printf("Build package %s during running failed, err: %s", path, err.Error())
+					continue
+				}
+			}
 			tcNames := make([]string, len(cases))
 			for i, tc := range cases {
 				tcNames[i] = tc.Name
@@ -139,32 +187,39 @@ func parseTestcases(testSelectors []string) ([]*ginkgoTestcase.TestCase, error) 
 }
 
 func (o *ExecuteOptions) RunExecute(cmd *cobra.Command) error {
-	// load case info from yaml file
 	config, err := ginkgoTestcase.UnmarshalCaseInfo(o.executePath)
 	if err != nil {
-		return err
+		return pkgErrors.Wrapf(err, "failed to unmarshal case info")
 	}
-	// parse testcases
 	testcases, err := parseTestcases(config.TestSelectors)
 	if err != nil {
-		return err
+		return pkgErrors.Wrapf(err, "failed to parse test selectors")
 	}
-	// get workspace
+	// 递归查询包含实际可执行用例的目录
+	excutableTestcases, err := discoverExecutableTestcases(testcases)
+	if err != nil {
+		return pkgErrors.Wrapf(err, "failed to discover excutble testcases")
+	}
 	projPath := ginkgoUtil.GetWorkspace(config.ProjectPath)
 	_, err = os.Stat(projPath)
 	if err != nil {
-		return fmt.Errorf("stat project path %s failed, err: %s", projPath, err.Error())
+		return pkgErrors.Wrapf(err, "stat project path %s failed", projPath)
 	}
-	// get testcases grouped by path and name
-	packages, err := groupTestCasesByPathAndName(projPath, testcases)
+	packages, err := groupTestCasesByPathAndName(projPath, excutableTestcases)
 	if err != nil {
-		return err
+		return pkgErrors.Wrap(err, "failed to group testcases by path and name")
 	}
-	// run testcases
 	testResults, err := executeTestcases(projPath, packages)
 	if err != nil {
-		return err
+		return pkgErrors.Wrapf(err, "failed to execute testcases")
 	}
-	// report test results
-	return reportTestResults(testResults)
+	reporter, err := sdkClient.NewReporterClient(config.FileReportPath)
+	if err != nil {
+		return pkgErrors.Wrap(err, "failed to create reporter")
+	}
+	err = reportTestResults(testResults, reporter)
+	if err != nil {
+		return pkgErrors.Wrap(err, "failed to report test results")
+	}
+	return nil
 }
