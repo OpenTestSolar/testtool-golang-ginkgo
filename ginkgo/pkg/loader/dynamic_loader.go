@@ -184,37 +184,34 @@ func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgo
 func dynamicLoadTestcase(projPath string, selectorPath string) ([]*ginkgoTestcase.TestCase, error) {
 	var caseList []*ginkgoTestcase.TestCase
 	absSelectorPath := filepath.Join(projPath, selectorPath)
-	pathList, err := findTestSuiteDirs(absSelectorPath)
-	if err != nil {
-		log.Printf("find test suite dirs from %s failed: %v", selectorPath, err)
-		return nil, err
-	}
-	log.Printf("find test suite dirs from %s: %v", selectorPath, pathList)
+	// pathList, err := findTestSuiteDirs(absSelectorPath)
+	// if err != nil {
+	// 	log.Printf("find test suite dirs from %s failed: %v", selectorPath, err)
+	// 	return nil, err
+	// }
+	// log.Printf("find test suite dirs from %s: %v", selectorPath, pathList)
 	pkgBin := findBinFile(absSelectorPath)
 	if pkgBin == "" {
 		log.Printf("package bin file not exist, ignore load testcase")
 		return caseList, nil
 	}
 	ginkgoVersion := findGinkgoVersion(absSelectorPath)
-	log.Printf("find ginkgo version %v", ginkgoVersion)
-	for _, path := range pathList {
-		log.Printf("load testcase by bin file %s under ginkgo %d", pkgBin, ginkgoVersion)
-		var err error
-		var testcaseList []*ginkgoTestcase.TestCase
-		if ginkgoVersion == 2 {
-			testcaseList, err = ginkgo_v2_load(projPath, path, pkgBin, ginkgoVersion)
-		} else {
-			testcaseList, err = ginkgo_v1_load(projPath, pkgBin, ginkgoVersion)
-		}
-		if err != nil {
-			log.Printf("load testcase by bin file %s failed, err: %v", pkgBin, err)
-		}
-		log.Println("load testcase:")
-		for _, testcase := range testcaseList {
-			log.Println(testcase)
-		}
-		caseList = append(caseList, testcaseList...)
+	log.Printf("load testcase by bin file %s under ginkgo %d", pkgBin, ginkgoVersion)
+	var err error
+	var testcaseList []*ginkgoTestcase.TestCase
+	if ginkgoVersion == 2 {
+		testcaseList, err = ginkgo_v2_load(projPath, selectorPath, pkgBin, ginkgoVersion)
+	} else {
+		testcaseList, err = ginkgo_v1_load(projPath, pkgBin, ginkgoVersion)
 	}
+	if err != nil {
+		log.Printf("load testcase by bin file %s failed, err: %v", pkgBin, err)
+		return nil, err
+	}
+	for _, testcase := range testcaseList {
+		log.Println(testcase.GetSelector())
+	}
+	caseList = append(caseList, testcaseList...)
 	return caseList, nil
 }
 
