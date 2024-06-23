@@ -19,28 +19,28 @@ import (
 	"github.com/pkg/errors"
 )
 
-func findTestSuiteDirs(absPath string) ([]string, error) {
-	var testDirs []string
-	visited := make(map[string]bool)
-	log.Printf("find test suite from directory: %s", absPath)
-	err := filepath.Walk(absPath, func(currentPath string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && strings.HasSuffix(info.Name(), "_test.go") {
-			dir := filepath.Dir(currentPath) // 获取文件所在的目录路径
-			if !visited[dir] {
-				visited[dir] = true
-				testDirs = append(testDirs, dir)
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	return testDirs, nil
-}
+// func findTestSuiteDirs(absPath string) ([]string, error) {
+// 	var testDirs []string
+// 	visited := make(map[string]bool)
+// 	log.Printf("find test suite from directory: %s", absPath)
+// 	err := filepath.Walk(absPath, func(currentPath string, info os.FileInfo, err error) error {
+// 		if err != nil {
+// 			return err
+// 		}
+// 		if !info.IsDir() && strings.HasSuffix(info.Name(), "_test.go") {
+// 			dir := filepath.Dir(currentPath) // 获取文件所在的目录路径
+// 			if !visited[dir] {
+// 				visited[dir] = true
+// 				testDirs = append(testDirs, dir)
+// 			}
+// 		}
+// 		return nil
+// 	})
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return testDirs, nil
+// }
 
 func findGinkgoVersion(path string) (ginkgoVersion int) {
 	err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
