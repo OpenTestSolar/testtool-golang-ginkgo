@@ -32,12 +32,12 @@ func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNam
 				cmdArgs.Merge(extraCmdArgs)
 			}
 		}
-		// 判断是否需要通过`--focus`的形式下发用例执行
-		// 特殊情况下ginkgo用例名中存在特殊字符，拼接到命令行中会导致报错，因此需要避免使用focus参数
+		// 通过环境变量控制是否需要以`--focus`的形式下发用例执行
+		// 部分场景下ginkgo用例名中存在特殊字符，拼接到命令行中会导致报错，因此需要避免使用focus参数
 		if cmdArgs.NeedFocus() {
 			cmdArgs.AddOrReplaceArgs([]*cmdpkg.CommandArg{{Key: "--focus", Value: fmt.Sprintf("\"%s\"", cmdpkg.GenTestCaseFocusName(tcNames))}})
 		}
-		cmdArgs.AddOrReplaceArgs([]*cmdpkg.CommandArg{{Key: "-p", Value: pkgBin}})
+		cmdArgs.Add(&cmdpkg.CommandArg{Key: "", Value: pkgBin})
 		cmdline := cmdArgs.GenerateCmdLineStr()
 		return cmdline
 	} else {

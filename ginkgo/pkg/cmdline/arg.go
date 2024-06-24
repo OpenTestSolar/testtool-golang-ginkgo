@@ -3,6 +3,8 @@ package cmdline
 import (
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/google/shlex"
@@ -113,6 +115,8 @@ func (ca *CommandArgs) GenerateCmdLineStr() string {
 	for _, arg := range ca.Args {
 		if arg.Value == "" {
 			cmdLineItems = append(cmdLineItems, arg.Key)
+		} else if arg.Key == "" {
+			cmdLineItems = append(cmdLineItems, arg.Value)
 		} else {
 			tmp := strings.Join([]string{arg.Key, arg.Value}, " ")
 			cmdLineItems = append(cmdLineItems, tmp)
@@ -123,10 +127,9 @@ func (ca *CommandArgs) GenerateCmdLineStr() string {
 }
 
 func (ca *CommandArgs) NeedFocus() bool {
-	for _, arg := range ca.Args {
-		if strings.HasPrefix(arg.Key, "--focus") || strings.HasPrefix(arg.Key, "--skip") || strings.HasSuffix(arg.Key, "label-filter") {
-			return false
-		}
+	if ok, err := strconv.ParseBool(os.Getenv("TESTSOLAR_TTP_FOCUS")); err != nil {
+		return true
+	} else {
+		return ok
 	}
-	return true
 }
