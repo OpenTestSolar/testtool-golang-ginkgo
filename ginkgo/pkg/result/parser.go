@@ -86,12 +86,12 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 		fmt.Print("no valid suite in results")
 		return []*sdkModel.TestResult{}, nil
 	}
-	splitor := getSplitor()
+	// splitor := getSplitor()
 	for _, spec := range suite.SpecReports {
 		if !spec.isValidResultType() {
 			continue
 		}
-		specName := spec.genarateSpecName(splitor)
+		specName := spec.genarateSpecName()
 		if specName == "" {
 			continue
 		}

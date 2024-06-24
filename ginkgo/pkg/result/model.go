@@ -84,7 +84,7 @@ type Spec struct {
 	ParallelProcess            int64
 }
 
-func (s *Spec) genarateSpecName(splitor string) string {
+func (s *Spec) genarateSpecName() string {
 	var specName string
 	if s.ContainerHierarchyTexts == nil {
 		// 需要上报beforeSuite和afterSuite的情况
@@ -102,11 +102,11 @@ func (s *Spec) genarateSpecName(splitor string) string {
 				continue
 			}
 			if specName != "" && strings.TrimSpace(specName) != "" {
-				specName += splitor
+				specName += " "
 			}
 			specName += name
 		}
-		specName += "/" + s.LeafNodeText
+		specName += " " + s.LeafNodeText
 		specName = addLabels(specName, s.ContainerHierarchyLabels, s.LeafNodeLabels)
 	}
 	return specName

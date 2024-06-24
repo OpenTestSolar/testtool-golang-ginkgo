@@ -20,24 +20,26 @@ func addLabels(specName string, hierarchyLabels [][]string, nodeLabels []string)
 		return false
 	}
 
-	if addLabel, _ := strconv.ParseBool(os.Getenv("TESTSOLAR_TTP_WITHLABELS")); addLabel {
-		var labels []string
-		for _, containerLabels := range hierarchyLabels {
-			for _, label := range containerLabels {
-				if !inLabels(labels, label) {
-					labels = append(labels, label)
-				}
-			}
-		}
-		for _, label := range nodeLabels {
+	var labels []string
+	for _, containerLabels := range hierarchyLabels {
+		for _, label := range containerLabels {
 			if !inLabels(labels, label) {
 				labels = append(labels, label)
 			}
 		}
-		if len(labels) != 0 {
-			specName += " " + fmt.Sprintf("[%s]", strings.Join(labels, ", "))
+	}
+	for _, label := range nodeLabels {
+		if !inLabels(labels, label) {
+			labels = append(labels, label)
 		}
 	}
+	if len(labels) != 0 {
+		specName += " " + fmt.Sprintf("[%s]", strings.Join(labels, ", "))
+	}
+
+	// if addLabel, _ := strconv.ParseBool(os.Getenv("TESTSOLAR_TTP_WITHLABELS")); addLabel {
+		
+	// }
 	return specName
 }
 

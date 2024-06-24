@@ -55,7 +55,7 @@ func ParseCaseByReg(proj string, output string, ginkgoVersion int) ([]*ginkgoTes
 			casePath := strings.Split(strings.TrimSpace(path), proj)[1]
 			casePath = casePath[1:]
 
-			name := strings.Join(nameList, "/")
+			name := strings.Join(nameList, " ")
 			caseInfo := &ginkgoTestcase.TestCase{
 				Path:       casePath,
 				Name:       strings.TrimSpace(name),
