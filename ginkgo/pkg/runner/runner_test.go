@@ -25,6 +25,9 @@ func TestGenarateCommandLine(t *testing.T) {
 	expected := `ginkgo --v --no-color --trace --json-report "output.json" --output-dir "/data/workspace" --always-emit-ginkgo-writer --procs "3" --timeout "5h" --focus "case" --label-filter "( label01||label02)" suite.test`
 	cmdline := genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin, tcNames, true)
 	assert.Equal(t, expected, cmdline, "should return the expected command line")
+	extraArgs = "b64://LS1wcm9jcyAzIC0tdGltZW91dCA1aCAtLWZvY3VzICJjYXNlIiAtLWxhYmVsLWZpbHRlciAiKCBsYWJlbDAxfHxsYWJlbDAyKSIgLS10aW1lb3V0IDVoIA=="
+	cmdline = genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin, tcNames, true)
+	assert.Equal(t, expected, cmdline, "should return the expected command line")
 }
 
 func Test_obtainExpectedExecuteCases(t *testing.T) {
@@ -37,7 +40,7 @@ func Test_obtainExpectedExecuteCases(t *testing.T) {
 	_, err = os.Stat(pkgBin)
 	assert.NoError(t, err)
 	defer os.Remove(pkgBin)
-	cmdline := fmt.Sprintf("ginkgo --v --no-color --procs 10 --always-emit-ginkgo-writer -p %s", pkgBin)
+	cmdline := fmt.Sprintf("ginkgo --v --no-color --procs 10 --always-emit-ginkgo-writer %s", pkgBin)
 	err = os.Setenv("TESTSOLAR_TTP_EXTRAARGS", "1")
 	assert.NoError(t, err)
 	expectedCases := obtainExpectedExecuteCasesByDryRun(projPath, cmdline)
@@ -54,7 +57,7 @@ func Test_getExpectedCases(t *testing.T) {
 	_, err = os.Stat(pkgBin)
 	assert.NoError(t, err)
 	defer os.Remove(pkgBin)
-	cmdline := fmt.Sprintf("ginkgo --v --no-color --procs 10 --always-emit-ginkgo-writer -p %s", pkgBin)
+	cmdline := fmt.Sprintf("ginkgo --v --no-color --procs 10 --always-emit-ginkgo-writer %s", pkgBin)
 	err = os.Setenv("TESTSOLAR_TTP_EXTRAARGS", "1")
 	assert.NoError(t, err)
 	expectedCases := getExpectedCases(cmdline, projPath, "tests/ginkgo/demo/demo_test.go", "tests/ginkgo/demo", []string{})
@@ -80,7 +83,7 @@ func Test_convertExpectedCasesToFailedCases(t *testing.T) {
 }
 
 func Test_regenerateDryRunCmd(t *testing.T) {
-	dryRunCmd, err := regenerateDryRunCmd(`ginkgo --v --no-color --trace --json-report output.json --output-dir /data/workspace --always-emit-ginkgo-writer --procs "10" --timeout "5h" --label-filter "(label01)" -p /data/workspace`)
+	dryRunCmd, err := regenerateDryRunCmd(`ginkgo --v --no-color --trace --json-report output.json --output-dir /data/workspace --always-emit-ginkgo-writer --procs "10" --timeout "5h" --label-filter "(label01)" /data/workspace.test`)
 	assert.NoError(t, err)
-	assert.Equal(t, dryRunCmd, `ginkgo --v --no-color --trace --json-report "output.json" --output-dir "/data/workspace" --timeout "5h" --label-filter "(label01)" --dry-run "/data/workspace"`)
+	assert.Equal(t, dryRunCmd, `ginkgo --dry-run --v --no-color --trace --json-report "output.json" --output-dir "/data/workspace" --timeout "5h" --label-filter "(label01)" /data/workspace.test`)
 }

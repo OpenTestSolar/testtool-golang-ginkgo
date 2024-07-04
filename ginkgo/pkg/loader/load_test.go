@@ -11,6 +11,8 @@ import (
 
 func TestLoadTestCase(t *testing.T) {
 	// test static loading testcase in directory
+	err := os.Setenv("TESTSOLAR_TTP_PARSEMODE", "static")
+	assert.NoError(t, err)
 	absPath, err := filepath.Abs("../../testdata/")
 	assert.NoError(t, err)
 	testcases, loadErrors := LoadTestCase(absPath, "demo")

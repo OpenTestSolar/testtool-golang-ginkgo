@@ -25,7 +25,7 @@ func LoadTestCase(projPath string, selectorPath string) ([]*ginkgoTestcase.TestC
 	parseMode := os.Getenv("TESTSOLAR_TTP_PARSEMODE")
 	log.Printf("Try to load testcases from path %s, parse mode: %s", selectorAbsPath, parseMode)
 	if fi.IsDir() {
-		if parseMode == "dynamic" {
+		if parseMode != "static" {
 			loadedTestCases, lErrors := DynamicLoadTestcaseInDir(projPath, selectorAbsPath)
 			testcaseList = append(testcaseList, loadedTestCases...)
 			loadErrors = append(loadErrors, lErrors...)
@@ -41,7 +41,7 @@ func LoadTestCase(projPath string, selectorPath string) ([]*ginkgoTestcase.TestC
 			}
 		}
 	} else {
-		if parseMode == "dynamic" {
+		if parseMode != "static" {
 			loadedTestCases, lErrors := DynamicLoadTestcaseInFile(projPath, selectorAbsPath)
 			testcaseList = append(testcaseList, loadedTestCases...)
 			loadErrors = append(loadErrors, lErrors...)
