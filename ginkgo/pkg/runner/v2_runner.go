@@ -5,7 +5,6 @@ import (
 	cmdpkg "ginkgo/pkg/cmdline"
 	"log"
 	"os"
-	"path"
 	"strings"
 	"time"
 
@@ -32,12 +31,12 @@ func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNam
 				cmdArgs.Merge(extraCmdArgs)
 			}
 		}
-		// 判断是否需要通过`--focus`的形式下发用例执行
-		// 特殊情况下ginkgo用例名中存在特殊字符，拼接到命令行中会导致报错，因此需要避免使用focus参数
+		// 通过环境变量控制是否需要以`--focus`的形式下发用例执行
+		// 部分场景下ginkgo用例名中存在特殊字符，拼接到命令行中会导致报错，因此需要避免使用focus参数
 		if cmdArgs.NeedFocus() {
-			cmdArgs.AddOrReplaceArgs([]*cmdpkg.CommandArg{{Key: "--focus", Value: fmt.Sprintf("\"%s\"", cmdpkg.GenTestCaseFocusName(tcNames))}})
+			cmdArgs.AddIfNotExists([]*cmdpkg.CommandArg{{Key: "--focus", Value: fmt.Sprintf("\"%s\"", cmdpkg.GenTestCaseFocusName(tcNames))}})
 		}
-		cmdArgs.AddOrReplaceArgs([]*cmdpkg.CommandArg{{Key: "-p", Value: pkgBin}})
+		cmdArgs.Add(&cmdpkg.CommandArg{Key: "", Value: pkgBin})
 		cmdline := cmdArgs.GenerateCmdLineStr()
 		return cmdline
 	} else {
@@ -176,7 +175,7 @@ func getExpectedCases(cmdline, projPath, filepath, packPath string, tcNames []st
 }
 
 func RunGinkgoV2Test(projPath, pkgBin, filepath string, tcNames []string) ([]*sdkModel.TestResult, error) {
-	outputJsonFile := path.Join(projPath, "output.json")
+	outputJsonFile := fmt.Sprintf("output-%s.json", ginkgoUtil.GenRandomString(8))
 	err := ginkgoUtil.RemoveFile(outputJsonFile)
 	if err != nil {
 		log.Printf("failed to remove output json file, err: %s", err.Error())
@@ -194,7 +193,7 @@ func RunGinkgoV2Test(projPath, pkgBin, filepath string, tcNames []string) ([]*sd
 		return generateFailedCasesWhenSuitePanic(stdout, stderr, nil, expectedCases), nil
 	}
 	log.Printf("Parse json file %s", outputJsonFile)
-	resultParser, err := ginkgoResult.NewResultParser(outputJsonFile, projPath, packPath)
+	resultParser, err := ginkgoResult.NewResultParser(outputJsonFile, projPath, packPath, true)
 	if err != nil {
 		log.Printf("instantiate result parser failed, err: %s", err.Error())
 		return nil, err

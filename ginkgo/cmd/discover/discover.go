@@ -1,7 +1,6 @@
 package discover
 
 import (
-	"fmt"
 	ginkgoLoader "ginkgo/pkg/loader"
 	ginkgoSelector "ginkgo/pkg/selector"
 	ginkgoTestcase "ginkgo/pkg/testcase"
@@ -9,8 +8,11 @@ import (
 	"log"
 	"os"
 
+	"github.com/OpenTestSolar/testtool-sdk-golang/api"
 	sdkClient "github.com/OpenTestSolar/testtool-sdk-golang/client"
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
+	"github.com/pkg/errors"
+	pkgErrors "github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -56,12 +58,7 @@ func parseTestSelectors(testSelector []string) []*ginkgoSelector.TestSelector {
 	return targetSelectors
 }
 
-func reportTestcases(testcases []*ginkgoTestcase.TestCase) error {
-	reporter, err := sdkClient.NewReporterClient()
-	if err != nil {
-		fmt.Printf("Failed to create reporter: %v\n", err)
-		return err
-	}
+func reportTestcases(testcases []*ginkgoTestcase.TestCase, loadErrors []*sdkModel.LoadError, reporter api.Reporter) error {
 	var tests []*sdkModel.TestCase
 	for _, testcase := range testcases {
 		tests = append(tests, &sdkModel.TestCase{
@@ -69,24 +66,19 @@ func reportTestcases(testcases []*ginkgoTestcase.TestCase) error {
 			Attributes: testcase.Attributes,
 		})
 	}
-	err = reporter.ReportLoadResult(&sdkModel.LoadResult{
+	err := reporter.ReportLoadResult(&sdkModel.LoadResult{
 		Tests:      tests,
-		LoadErrors: nil,
+		LoadErrors: loadErrors,
 	})
 	if err != nil {
-		fmt.Printf("Failed to report load result: %v\n", err)
-		return err
-	}
-	err = reporter.Close()
-	if err != nil {
-		fmt.Printf("Failed to close report: %v\n", err)
-		return err
+		return errors.Wrap(err, "failed to report load result")
 	}
 	return nil
 }
 
-func loadTestcases(projPath string, targetSelectors []*ginkgoSelector.TestSelector) []*ginkgoTestcase.TestCase {
+func loadTestcases(projPath string, targetSelectors []*ginkgoSelector.TestSelector) ([]*ginkgoTestcase.TestCase, []*sdkModel.LoadError) {
 	var testcases []*ginkgoTestcase.TestCase
+	var loadErrors []*sdkModel.LoadError
 	loadedSelectorPath := make(map[string]struct{})
 	for _, testSelector := range targetSelectors {
 		// skip the path that has been loaded
@@ -94,34 +86,33 @@ func loadTestcases(projPath string, targetSelectors []*ginkgoSelector.TestSelect
 			continue
 		}
 		loadedSelectorPath[testSelector.Path] = struct{}{}
-
-		loadedTestcases, err := ginkgoLoader.LoadTestCase(projPath, testSelector.Path)
-		if err != nil {
-			log.Printf("Load testcase from path %s failed, err: %v", testSelector.Path, err)
-			continue
-		}
+		loadedTestcases, lErrors := ginkgoLoader.LoadTestCase(projPath, testSelector.Path)
 		testcases = append(testcases, loadedTestcases...)
+		loadErrors = append(loadErrors, lErrors...)
 	}
-	return testcases
+	return testcases, loadErrors
 }
 
 func (o *DiscoverOptions) RunDiscover(cmd *cobra.Command) error {
-	// load case info from yaml file
 	config, err := ginkgoTestcase.UnmarshalCaseInfo(o.discoverPath)
 	if err != nil {
-		return err
+		return pkgErrors.Wrapf(err, "failed to unmarshal case info")
 	}
-	// parse selectors
 	targetSelectors := parseTestSelectors(config.TestSelectors)
 	log.Printf("load testcases from selectors: %s", targetSelectors)
-	// get workspace
 	projPath := ginkgoUtil.GetWorkspace(config.ProjectPath)
 	_, err = os.Stat(projPath)
 	if err != nil {
-		return fmt.Errorf("stat project path %s failed, err: %s", projPath, err.Error())
+		return pkgErrors.Wrapf(err, "stat project path %s failed", projPath)
 	}
-	// load testcases
-	testcases := loadTestcases(projPath, targetSelectors)
-	// report testcases
-	return reportTestcases(testcases)
+	testcases, loadErrors := loadTestcases(projPath, targetSelectors)
+	reporter, err := sdkClient.NewReporterClient(config.FileReportPath)
+	if err != nil {
+		return errors.Wrapf(err, "failed to create reporter")
+	}
+	err = reportTestcases(testcases, loadErrors, reporter)
+	if err != nil {
+		return errors.Wrapf(err, "failed to report testcases")
+	}
+	return nil
 }

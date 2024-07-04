@@ -1,6 +1,7 @@
 package cmdline
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -107,6 +108,8 @@ func TestNeedFocus(t *testing.T) {
 	ca, err = NewCmdArgsParseByCmdLine(cmdline)
 	assert.NoError(t, err)
 	assert.Equal(t, len(ca.Args), 3)
+	err = os.Setenv("TESTSOLAR_TTP_FOCUS", "false")
+	assert.NoError(t, err)
 	focus = ca.NeedFocus()
 	assert.Equal(t, focus, false)
 }

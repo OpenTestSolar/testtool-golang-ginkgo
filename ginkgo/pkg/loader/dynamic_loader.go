@@ -14,30 +14,33 @@ import (
 
 	ginkgoTestcase "ginkgo/pkg/testcase"
 	ginkgoUtil "ginkgo/pkg/util"
+
+	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
+	"github.com/pkg/errors"
 )
 
-func findTestSuiteDirs(absPath string) ([]string, error) {
-	var testDirs []string
-	visited := make(map[string]bool)
-	log.Printf("find test suite from directory: %s", absPath)
-	err := filepath.Walk(absPath, func(currentPath string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && strings.HasSuffix(info.Name(), "_test.go") {
-			dir := filepath.Dir(currentPath) // 获取文件所在的目录路径
-			if !visited[dir] {
-				visited[dir] = true
-				testDirs = append(testDirs, dir)
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	return testDirs, nil
-}
+// func findTestSuiteDirs(absPath string) ([]string, error) {
+// 	var testDirs []string
+// 	visited := make(map[string]bool)
+// 	log.Printf("find test suite from directory: %s", absPath)
+// 	err := filepath.Walk(absPath, func(currentPath string, info os.FileInfo, err error) error {
+// 		if err != nil {
+// 			return err
+// 		}
+// 		if !info.IsDir() && strings.HasSuffix(info.Name(), "_test.go") {
+// 			dir := filepath.Dir(currentPath) // 获取文件所在的目录路径
+// 			if !visited[dir] {
+// 				visited[dir] = true
+// 				testDirs = append(testDirs, dir)
+// 			}
+// 		}
+// 		return nil
+// 	})
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return testDirs, nil
+// }
 
 func findGinkgoVersion(path string) (ginkgoVersion int) {
 	err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
@@ -153,7 +156,7 @@ func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgo
 		return caseList, fmt.Errorf("dry run report json file not exist")
 	}
 	log.Printf("Parse json file %s", reportJson)
-	resultParser, err := ginkgoResult.NewResultParser(reportJson, projPath, path)
+	resultParser, err := ginkgoResult.NewResultParser(reportJson, projPath, path, false)
 	if err != nil {
 		return nil, err
 	}
@@ -181,44 +184,44 @@ func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgo
 func dynamicLoadTestcase(projPath string, selectorPath string) ([]*ginkgoTestcase.TestCase, error) {
 	var caseList []*ginkgoTestcase.TestCase
 	absSelectorPath := filepath.Join(projPath, selectorPath)
-	pathList, err := findTestSuiteDirs(absSelectorPath)
-	if err != nil {
-		log.Printf("find test suite dirs from %s failed: %v", selectorPath, err)
-		return nil, err
-	}
-	log.Printf("find test suite dirs from %s: %v", selectorPath, pathList)
+	// pathList, err := findTestSuiteDirs(absSelectorPath)
+	// if err != nil {
+	// 	log.Printf("find test suite dirs from %s failed: %v", selectorPath, err)
+	// 	return nil, err
+	// }
+	// log.Printf("find test suite dirs from %s: %v", selectorPath, pathList)
 	pkgBin := findBinFile(absSelectorPath)
 	if pkgBin == "" {
 		log.Printf("package bin file not exist, ignore load testcase")
 		return caseList, nil
 	}
 	ginkgoVersion := findGinkgoVersion(absSelectorPath)
-	log.Printf("find ginkgo version %v", ginkgoVersion)
-	for _, path := range pathList {
-		log.Printf("load testcase by bin file %s under ginkgo %d", pkgBin, ginkgoVersion)
-		var err error
-		var testcaseList []*ginkgoTestcase.TestCase
-		if ginkgoVersion == 2 {
-			testcaseList, err = ginkgo_v2_load(projPath, path, pkgBin, ginkgoVersion)
-		} else {
-			testcaseList, err = ginkgo_v1_load(projPath, pkgBin, ginkgoVersion)
-		}
-		if err != nil {
-			log.Printf("load testcase by bin file %s failed, err: %v", pkgBin, err)
-		}
-		log.Println("load testcase:")
-		for _, testcase := range testcaseList {
-			log.Println(testcase)
-		}
-		caseList = append(caseList, testcaseList...)
+	log.Printf("load testcase by bin file %s under ginkgo %d", pkgBin, ginkgoVersion)
+	var err error
+	var testcaseList []*ginkgoTestcase.TestCase
+	if ginkgoVersion == 2 {
+		testcaseList, err = ginkgo_v2_load(projPath, selectorPath, pkgBin, ginkgoVersion)
+	} else {
+		testcaseList, err = ginkgo_v1_load(projPath, pkgBin, ginkgoVersion)
 	}
+	if err != nil {
+		log.Printf("load testcase by bin file %s failed, err: %v", pkgBin, err)
+		return nil, err
+	}
+	for _, testcase := range testcaseList {
+		log.Println(testcase.GetSelector())
+	}
+	caseList = append(caseList, testcaseList...)
 	return caseList, nil
 }
 
-func getAvailableSuitePath(projPath, rootPath string) []string {
+func getAvailableSuitePath(projPath, rootPath string) ([]string, error) {
 	var packageList []string
-	err := filepath.Walk(rootPath, func(path string, fi os.FileInfo, _ error) error {
-		if strings.HasSuffix(path, "_suite_test.go") {
+	err := filepath.Walk(rootPath, func(path string, fi os.FileInfo, e error) error {
+		if e != nil {
+			return errors.Wrapf(e, "failed to walk %s", path)
+		}
+		if !fi.IsDir() && strings.HasSuffix(path, "_suite_test.go") {
 			packagePath := filepath.Dir(path)
 			if packagePath == projPath {
 				packagePath = ""
@@ -232,21 +235,33 @@ func getAvailableSuitePath(projPath, rootPath string) []string {
 		return nil
 	})
 	if err != nil {
-		log.Printf("get available suite path failed: %v", err)
-		return nil
+		return nil, errors.Wrapf(err, "failed to walk %s", rootPath)
 	}
-	return packageList
+	return packageList, nil
 }
 
-func DynamicLoadTestcaseInDir(projPath string, rootPath string) ([]*ginkgoTestcase.TestCase, error) {
+func DynamicLoadTestcaseInDir(projPath string, rootPath string) ([]*ginkgoTestcase.TestCase, []*sdkModel.LoadError) {
 	var testcaseList []*ginkgoTestcase.TestCase
-	packageList := getAvailableSuitePath(projPath, rootPath)
+	var loadErrors []*sdkModel.LoadError
+	packageList, err := getAvailableSuitePath(projPath, rootPath)
+	if err != nil {
+		log.Printf("get available suite path of %s failed: %v", rootPath, err)
+		loadErrors = append(loadErrors, &sdkModel.LoadError{
+			Name:    rootPath,
+			Message: err.Error(),
+		})
+		return nil, loadErrors
+	}
 	log.Printf("Available package list: %v, root path: %s", packageList, rootPath)
 	for _, packagePath := range packageList {
 		log.Printf("Start dynamic load testcase from: %v", packagePath)
 		caseList, err := dynamicLoadTestcase(projPath, packagePath)
 		if err != nil {
 			log.Printf("dynamic load testcase from %s failed, err: %v", packagePath, err)
+			loadErrors = append(loadErrors, &sdkModel.LoadError{
+				Name:    packagePath,
+				Message: err.Error(),
+			})
 			continue
 		}
 		// 如果加载出来的用例实际路径与下发的包路径不一致，则表明该用例为共享用例（用例被其他路径下的用例所引用）
@@ -259,29 +274,31 @@ func DynamicLoadTestcaseInDir(projPath string, rootPath string) ([]*ginkgoTestca
 		}
 		testcaseList = append(testcaseList, caseList...)
 	}
-	return testcaseList, nil
+	return testcaseList, loadErrors
 }
 
-func DynamicLoadTestcaseInFile(projPath string, filePath string) ([]*ginkgoTestcase.TestCase, error) {
-	var testcaseList []*ginkgoTestcase.TestCase
+func DynamicLoadTestcaseInFile(projPath string, filePath string) ([]*ginkgoTestcase.TestCase, []*sdkModel.LoadError) {
+	var loadErrors []*sdkModel.LoadError
 	selectorPath, err := filepath.Rel(projPath, filePath)
 	if err != nil {
-		log.Printf("Err split projpath with filePath: %v\n", err)
-		return testcaseList, err
+		log.Printf("get path %s rel path %s failed: %v", filePath, projPath, err)
+		loadErrors = append(loadErrors, &sdkModel.LoadError{
+			Name:    selectorPath,
+			Message: err.Error(),
+		})
+		return nil, loadErrors
 	}
-	log.Printf("Start dynamic load testcase file")
+	log.Printf("Start dynamic load testcase in file %s", selectorPath)
 	// 这里处理文件，扫描文件上一层的用例，然后过滤
 	parentDir := filepath.Dir(selectorPath)
-	caseList, err := dynamicLoadTestcase(projPath, parentDir)
+	testcaseList, err := dynamicLoadTestcase(projPath, parentDir)
 	if err != nil {
-		log.Printf("dynamic load testcase failed: %v", err)
-		return testcaseList, err
+		log.Printf("dynamic load testcase in %s failed: %v", selectorPath, err)
+		loadErrors = append(loadErrors, &sdkModel.LoadError{
+			Name:    selectorPath,
+			Message: err.Error(),
+		})
+		return nil, loadErrors
 	}
-	var selectedTestCases []*ginkgoTestcase.TestCase
-	for _, testCase := range caseList {
-		if strings.Contains(testCase.Path, selectorPath) {
-			selectedTestCases = append(selectedTestCases, testCase)
-		}
-	}
-	return selectedTestCases, nil
+	return testcaseList, nil
 }

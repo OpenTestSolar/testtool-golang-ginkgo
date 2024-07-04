@@ -17,9 +17,10 @@ type ResultParser struct {
 	suites   []*Suite
 	projPath string
 	packPath string
+	run      bool
 }
 
-func NewResultParser(filePath string, projectPath string, packPath string) (*ResultParser, error) {
+func NewResultParser(filePath string, projectPath string, packPath string, run bool) (*ResultParser, error) {
 	byteValue, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("read result file failed, err: %s", err.Error())
@@ -34,6 +35,7 @@ func NewResultParser(filePath string, projectPath string, packPath string) (*Res
 		suites:   suites,
 		projPath: projectPath,
 		packPath: packPath,
+		run:      run,
 	}, nil
 }
 
@@ -86,12 +88,15 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 		fmt.Print("no valid suite in results")
 		return []*sdkModel.TestResult{}, nil
 	}
-	splitor := getSplitor()
 	for _, spec := range suite.SpecReports {
 		if !spec.isValidResultType() {
 			continue
 		}
-		specName := spec.genarateSpecName(splitor)
+		// 若用例为BeforeSuite｜AfterSuite｜ReportAfterSuite，则需要在执行阶段(p.run==false)且状态不为passed时才上报
+		if spec.IsSetUpStage() && (!p.run || spec.State == "passed") {
+			continue
+		}
+		specName := spec.genarateSpecName()
 		if specName == "" {
 			continue
 		}

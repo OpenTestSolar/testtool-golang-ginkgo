@@ -141,3 +141,8 @@ func TestFileExistsWhenFileExists(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, exists)
 }
+
+func TestGenRandomString(t *testing.T) {
+	got := GenRandomString(10)
+	assert.Equal(t, 10, len(got))
+}

@@ -2,8 +2,6 @@ package result
 
 import (
 	"fmt"
-	"os"
-	"strconv"
 	"strings"
 
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
@@ -20,34 +18,23 @@ func addLabels(specName string, hierarchyLabels [][]string, nodeLabels []string)
 		return false
 	}
 
-	if addLabel, _ := strconv.ParseBool(os.Getenv("TESTSOLAR_TTP_WITHLABELS")); addLabel {
-		var labels []string
-		for _, containerLabels := range hierarchyLabels {
-			for _, label := range containerLabels {
-				if !inLabels(labels, label) {
-					labels = append(labels, label)
-				}
-			}
-		}
-		for _, label := range nodeLabels {
+	var labels []string
+	for _, containerLabels := range hierarchyLabels {
+		for _, label := range containerLabels {
 			if !inLabels(labels, label) {
 				labels = append(labels, label)
 			}
 		}
-		if len(labels) != 0 {
-			specName += " " + fmt.Sprintf("[%s]", strings.Join(labels, ", "))
+	}
+	for _, label := range nodeLabels {
+		if !inLabels(labels, label) {
+			labels = append(labels, label)
 		}
 	}
-	return specName
-}
-
-func getSplitor() string {
-	// 通过环境变量控制用例名分割符
-	splitor := "/"
-	if split, _ := strconv.ParseBool(os.Getenv("TESTSOLAR_TTP_SPLITBYSPACE")); split {
-		splitor = " "
+	if len(labels) != 0 {
+		specName += " " + fmt.Sprintf("[%s]", strings.Join(labels, ", "))
 	}
-	return splitor
+	return specName
 }
 
 func splitByNewline(s string) []string {

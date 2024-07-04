@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -84,16 +82,9 @@ type Spec struct {
 	ParallelProcess            int64
 }
 
-func (s *Spec) genarateSpecName(splitor string) string {
+func (s *Spec) genarateSpecName() string {
 	var specName string
 	if s.ContainerHierarchyTexts == nil {
-		// 需要上报beforeSuite和afterSuite的情况
-		if s.LeafNodeType != "BeforeSuite" && s.LeafNodeType != "AfterSuite" {
-			return ""
-		}
-		if _, err := strconv.ParseBool(os.Getenv("TESTSOLAR_TTP_SHOWSETUP")); err != nil {
-			return ""
-		}
 		specName = s.LeafNodeType
 	} else {
 		for _, name := range s.ContainerHierarchyTexts {
@@ -102,10 +93,11 @@ func (s *Spec) genarateSpecName(splitor string) string {
 				continue
 			}
 			if specName != "" && strings.TrimSpace(specName) != "" {
-				specName += splitor
+				specName += " "
 			}
 			specName += name
 		}
+		// TODO: 确定具体分割符标识
 		specName += "/" + s.LeafNodeText
 		specName = addLabels(specName, s.ContainerHierarchyLabels, s.LeafNodeLabels)
 	}
@@ -253,6 +245,13 @@ func (s *Spec) GenerateSteps() []*sdkModel.TestCaseStep {
 		steps = append(steps, defaultStep)
 	}
 	return steps
+}
+
+func (s *Spec) IsSetUpStage() bool {
+	if s.LeafNodeType == "BeforeSuite" || s.LeafNodeType == "SynchronizedBeforeSuite" || s.LeafNodeType == "SynchronizedAfterSuite" || s.LeafNodeType == "AfterSuite" || s.LeafNodeType == "ReportAfterSuite" {
+		return true
+	}
+	return false
 }
 
 type Suite struct {

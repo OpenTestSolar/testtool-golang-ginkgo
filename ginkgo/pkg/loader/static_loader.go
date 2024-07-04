@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+
+	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 )
 
 func genTestCaseBySpec(path string, spec *TestCaseSpec, root *ginkgoTestcase.TestCase) ([]*ginkgoTestcase.TestCase, error) {
@@ -100,13 +102,21 @@ func parseTestCaseSpec(expr *ast.CallExpr) (*TestCaseSpec, error) {
 					testcaseSpec.subSpecs = append(testcaseSpec.subSpecs, subSpec)
 				}
 			case *ast.DeclStmt:
-				subSpec, err := parseTestCaseSpec(it.(*ast.DeclStmt).Decl.(*ast.GenDecl).Specs[0].(*ast.ValueSpec).Values[0].(*ast.CallExpr))
-				if err != nil {
-					log.Printf("Parse ginkgo testcase failed: %v", err)
+				if len(it.(*ast.DeclStmt).Decl.(*ast.GenDecl).Specs) == 0 {
 					continue
 				}
-				if subSpec != nil {
-					testcaseSpec.subSpecs = append(testcaseSpec.subSpecs, subSpec)
+				if len(it.(*ast.DeclStmt).Decl.(*ast.GenDecl).Specs[0].(*ast.ValueSpec).Values) == 0 {
+					continue
+				}
+				if subExpr, ok := it.(*ast.DeclStmt).Decl.(*ast.GenDecl).Specs[0].(*ast.ValueSpec).Values[0].(*ast.CallExpr); ok {
+					subSpec, err := parseTestCaseSpec(subExpr)
+					if err != nil {
+						log.Printf("Parse ginkgo testcase failed: %v", err)
+						continue
+					}
+					if subSpec != nil {
+						testcaseSpec.subSpecs = append(testcaseSpec.subSpecs, subSpec)
+					}
 				}
 			}
 		}
@@ -115,21 +125,31 @@ func parseTestCaseSpec(expr *ast.CallExpr) (*TestCaseSpec, error) {
 	return nil, nil
 }
 
-func ParseTestCaseInFile(projPath string, path string) ([]*ginkgoTestcase.TestCase, error) {
+func ParseTestCaseInFile(projPath string, path string) ([]*ginkgoTestcase.TestCase, []*sdkModel.LoadError) {
 	var testcaseList []*ginkgoTestcase.TestCase
+	var loadErrors []*sdkModel.LoadError
 	if !strings.HasSuffix(path, "_test.go") {
-		return testcaseList, nil
+		return nil, nil
 	}
 	log.Println("Parse testcase in file", path)
 	code, err := os.ReadFile(path)
 	if err != nil {
-		return testcaseList, err
+		log.Printf("failed to read file %s", path)
+		loadErrors = append(loadErrors, &sdkModel.LoadError{
+			Name:    path,
+			Message: err.Error(),
+		})
+		return nil, loadErrors
 	}
 	fset := token.NewFileSet()
 	file, err := parser.ParseFile(fset, path, code, 0)
 	if err != nil {
-		log.Printf("Invalid go file %s", path)
-		return testcaseList, err
+		log.Printf("parse file %s failed, err: %s", path, err.Error())
+		loadErrors = append(loadErrors, &sdkModel.LoadError{
+			Name:    path,
+			Message: err.Error(),
+		})
+		return nil, loadErrors
 	}
 	ginkgoVersion := 0
 	for _, decl := range file.Decls {
@@ -151,18 +171,22 @@ func ParseTestCaseInFile(projPath string, path string) ([]*ginkgoTestcase.TestCa
 						case *ast.CallExpr:
 							spec, err := parseTestCaseSpec(value)
 							if err != nil {
-								log.Printf("Parse ginkgo testcase failed: %v", err)
+								log.Printf("Static parse ginkgo testcase in %s failed: %v", path, err)
+								loadErrors = append(loadErrors, &sdkModel.LoadError{
+									Name:    path,
+									Message: err.Error(),
+								})
 								continue
 							}
 							if spec != nil {
 								testcases, err := genTestCaseBySpec(path[len(projPath)+1:], spec, nil)
 								if err != nil {
 									log.Printf("Generate testcase failed: %v", err)
-									return testcaseList, err
+									return testcaseList, loadErrors
 								}
 								if ginkgoVersion == 0 {
 									log.Printf("ginkgo version was not found, Please check file import")
-									return testcaseList, nil
+									return testcaseList, loadErrors
 								}
 								for _, testcase := range testcases {
 									testcase.Attributes["ginkgoVersion"] = strconv.Itoa(ginkgoVersion)
@@ -175,5 +199,5 @@ func ParseTestCaseInFile(projPath string, path string) ([]*ginkgoTestcase.TestCa
 			}
 		}
 	}
-	return testcaseList, nil
+	return testcaseList, loadErrors
 }
