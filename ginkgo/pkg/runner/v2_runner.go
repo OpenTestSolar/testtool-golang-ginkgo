@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"encoding/base64"
 	"fmt"
 	cmdpkg "ginkgo/pkg/cmdline"
 	"log"
@@ -24,6 +25,14 @@ func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNam
 			return ""
 		}
 		if extraArgs != "" {
+			if strings.HasPrefix(extraArgs, "b64://") {
+				decodedValue, err := base64.StdEncoding.DecodeString(extraArgs[6:])
+				if err != nil {
+					log.Printf("Decode %s failed, err: %s", extraArgs, err.Error())
+				} else {
+					extraArgs = string(decodedValue)
+				}
+			}
 			extraCmdArgs, err := cmdpkg.NewCmdArgsParseByCmdLine(extraArgs)
 			if err != nil {
 				log.Printf("Parse extra cmd args [%s] error: %v", extraArgs, err)
@@ -55,24 +64,26 @@ func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNam
 // - 输入: cmd = "ginkgo --v --no-color --procs 10 --always-emit-ginkgo-writer -p /path/to/your/file.test"
 // - 输出: newCmd = "ginkgo --dry-run --v --no-color /path/to/your/file.test"
 func regenerateDryRunCmd(cmd string) (string, error) {
-	dryRunCmdExcludedKeys := []string{"--procs", "--always-emit-ginkgo-writer", "-p"}
+	dryRunCmdExcludedKeys := []string{"ginkgo", "--procs", "--always-emit-ginkgo-writer"}
 
 	originalCmdArgs, err := cmdpkg.NewCmdArgsParseByCmdLine(cmd)
 	if err != nil {
 		return "", err
 	}
 	dryRunCmdArgs := cmdpkg.NewCmdArgs()
+	dryRunCmdArgs.Add(&cmdpkg.CommandArg{
+		Key:   "ginkgo",
+		Value: "",
+	})
+	dryRunCmdArgs.Add(&cmdpkg.CommandArg{
+		Key:   "--dry-run",
+		Value: "",
+	})
 	for _, arg := range originalCmdArgs.Args {
 		if !ginkgoUtil.ElementIsInSlice(arg.Key, dryRunCmdExcludedKeys) {
 			dryRunCmdArgs.Add(arg)
 		}
 	}
-	dryRunCmdArgs.Extend(
-		[]*cmdpkg.CommandArg{
-			{Key: "--dry-run", Value: ""},
-			{Key: originalCmdArgs.GetValueByKey("-p"), Value: ""},
-		},
-	)
 	dryRunCmdLine := dryRunCmdArgs.GenerateCmdLineStr()
 	return dryRunCmdLine, nil
 }
@@ -180,7 +191,7 @@ func RunGinkgoV2Test(projPath, pkgBin, filepath string, tcNames []string) ([]*sd
 	if err != nil {
 		log.Printf("failed to remove output json file, err: %s", err.Error())
 	}
-	cmdline := genarateCommandLine(os.Getenv("TESTSOLAR_TTP_EXTRAARGS"), "output.json", projPath, pkgBin, tcNames, CheckGinkgoCli())
+	cmdline := genarateCommandLine(os.Getenv("TESTSOLAR_TTP_EXTRAARGS"), outputJsonFile, projPath, pkgBin, tcNames, CheckGinkgoCli())
 	log.Printf("Run cmdline %s", cmdline)
 	stdout, stderr, err := ginkgoUtil.RunCommandWithOutput(cmdline, projPath)
 	if err != nil {

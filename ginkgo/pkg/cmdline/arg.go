@@ -59,6 +59,9 @@ func NewCmdArgsParseByCmdLine(cmdline string) (*CommandArgs, error) {
 			cmdArgs = append(cmdArgs, &CommandArg{Key: key, Value: value})
 		}
 	}
+	if strings.HasSuffix(args[len(args)-1], ".test") {
+		cmdArgs = append(cmdArgs, &CommandArg{Key: "", Value: args[len(args)-1]})
+	}
 	return &CommandArgs{cmdArgs}, nil
 }
 
