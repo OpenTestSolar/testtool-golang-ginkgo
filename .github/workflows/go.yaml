@@ -51,4 +51,4 @@ jobs:
       - name: Validate metadata
         run: |
           pip install -U solar-registry
-          solar-registry validate gotest
+          solar-registry validate ginkgo
