@@ -39,7 +39,9 @@ supportOS:
 supportArch:
   - amd64
   - arm64
+repository: https://github.com/OpenTestSolar/testtool-golang-ginkgo
 gitPkgUrl: github.com/OpenTestSolar/testtool-golang-ginkgo@master:ginkgo
+httpPkgUrl: https://testsolar-1321258242.cos.ap-guangzhou.myqcloud.com/testtools/golang/ginkgo/metadata.json@stable
 entry:
   load: "solar-ginkgo discover -p $1"
   run: "solar-ginkgo execute -p $1"

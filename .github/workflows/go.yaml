@@ -40,3 +40,15 @@ jobs:
         run: |
           cd ginkgo
           ./coverage.sh
+  meta-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: '3.11'
+      - name: Validate metadata
+        run: |
+          pip install -U solar-registry
+          solar-registry validate gotest
