@@ -13,25 +13,64 @@ homePage: https://github.com/OpenTestSolar/testtool-golang-ginkgo
 parameterDefs:
   - name: workerCount
     value: 并发数
+    desc: 并发数
     default: "0"
+    inputWidget: number
   - name: parseMode
     value: 加载用例的模式
+    desc: 加载用例的模式
     default: "ast"
+    inputWidget: text
   - name: showSetup
     default: "false"
-    value: 将测试套的before suite以及after suite作为测试用例上报
+    value: 上报测试套Before/After
+    desc: 将测试套的before suite以及after suite作为测试用例上报
+    choices:
+      - desc: 是
+        value: 'true'
+      - desc: 否
+        value: 'false'
+    inputWidget: choices
   - name: withLabels
     default: "false"
     value: 用例中是否包含标签
+    desc: 用例中是否包含标签
+    choices:
+      - desc: 是
+        value: 'true'
+      - desc: 否
+        value: 'false'
+    inputWidget: choices
   - name: splitBySpace
     default: "false"
     value: 上报用例名是否以空格分割
+    desc: 上报用例名是否以空格分割
+    choices:
+      - desc: 是
+        value: 'true'
+      - desc: 否
+        value: 'false'
+    inputWidget: choices
   - name: concurrentBuild
     default: "false"
-    value: 是否并发编译生成二进制可执行文件
+    value: 并发编译
+    desc: 是否并发编译生成二进制可执行文件
+    choices:
+      - desc: 是
+        value: 'true'
+      - desc: 否
+        value: 'false'
+    inputWidget: choices
   - name: compressBinary
     default: "false"
-    value: 是否压缩编译后生成的二进制文件，镜像中需要包含`upx`工具
+    value: 是否压缩编译后生成的二进制文件
+    desc: 是否压缩编译后生成的二进制文件，镜像中需要包含`upx`工具
+    choices:
+      - desc: 是
+        value: 'true'
+      - desc: 否
+        value: 'false'
+    inputWidget: choices
 supportOS:
   - windows
   - linux
