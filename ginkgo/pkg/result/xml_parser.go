@@ -1,11 +1,12 @@
 package result
 
 import (
-	ginkgoUtil "ginkgo/pkg/util"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/util"
 
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 	"github.com/antchfx/xmlquery"

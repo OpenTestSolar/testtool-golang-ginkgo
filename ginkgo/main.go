@@ -1,9 +1,9 @@
 package main
 
 import (
-	"ginkgo/cmd/build"
-	"ginkgo/cmd/discover"
-	"ginkgo/cmd/execute"
+	"github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/cmd/build"
+	"github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/cmd/discover"
+	"github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/cmd/execute"
 
 	"github.com/spf13/cobra"
 )

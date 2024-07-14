@@ -3,10 +3,10 @@ set -ex
 # 使用COS上的安装脚本安装uniSDK，后续修改为testsolar的独立域名
 curl -Lk https://testsolar-1321258242.cos.ap-guangzhou.myqcloud.com/cli/testtools_sdk-install/stable/install.sh | bash
 
-TOOL_ROOT=$(dirname $(dirname $(dirname $(readlink -fm $0))))
+TOOL_ROOT=$(dirname $(dirname $(readlink -fm $0)))
 echo ${TOOL_ROOT}
 cd ${TOOL_ROOT}
 go mod tidy
 go mod download
-go build -o /usr/local/bin/solar-ginkgo main.go
+go build -o /usr/local/bin/solar-ginkgo ginkgo/main.go
 

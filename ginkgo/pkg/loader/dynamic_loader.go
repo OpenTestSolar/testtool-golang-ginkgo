@@ -2,7 +2,6 @@ package loader
 
 import (
 	"fmt"
-	ginkgoResult "ginkgo/pkg/result"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -12,8 +11,10 @@ import (
 	"strconv"
 	"strings"
 
-	ginkgoTestcase "ginkgo/pkg/testcase"
-	ginkgoUtil "ginkgo/pkg/util"
+	ginkgoResult "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/result"
+
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/util"
 
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 	"github.com/pkg/errors"

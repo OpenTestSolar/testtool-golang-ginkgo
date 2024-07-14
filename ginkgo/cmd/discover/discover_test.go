@@ -1,12 +1,13 @@
 package discover
 
 import (
-	"ginkgo/pkg/loader"
-	"ginkgo/pkg/selector"
-	"ginkgo/pkg/testcase"
-	ginkgoTestcase "ginkgo/pkg/testcase"
 	"path/filepath"
 	"testing"
+
+	"github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/loader"
+	"github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/selector"
+	"github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
 
 	"github.com/OpenTestSolar/testtool-sdk-golang/api"
 	sdkApi "github.com/OpenTestSolar/testtool-sdk-golang/api"
