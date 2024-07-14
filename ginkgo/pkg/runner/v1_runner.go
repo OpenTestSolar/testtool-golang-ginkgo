@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	cmdpkg "ginkgo/pkg/cmdline"
-	ginkgoResult "ginkgo/pkg/result"
-	ginkgoUtil "ginkgo/pkg/util"
+	cmdpkg "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/cmdline"
+	ginkgoResult "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/result"
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/util"
 
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 )

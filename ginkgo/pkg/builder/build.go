@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	ginkgoUtil "ginkgo/pkg/util"
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/util"
 
 	"github.com/avast/retry-go"
 	"github.com/sourcegraph/conc/pool"

@@ -1,10 +1,11 @@
 package runner
 
 import (
-	builder "ginkgo/pkg/builder"
 	"os"
 	"path/filepath"
 	"testing"
+
+	builder "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/builder"
 
 	"github.com/stretchr/testify/assert"
 )

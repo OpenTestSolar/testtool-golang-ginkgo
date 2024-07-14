@@ -1,9 +1,10 @@
 package runner
 
 import (
-	ginkgoTestcase "ginkgo/pkg/testcase"
 	"log"
 	"os/exec"
+
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
 )
 
 func GetGinkgoVersion(testcases []*ginkgoTestcase.TestCase) string {

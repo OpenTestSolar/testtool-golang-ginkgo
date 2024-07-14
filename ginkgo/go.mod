@@ -1,4 +1,4 @@
-module ginkgo
+module github.com/OpenTestSolar/testtool-golang-ginkgo
 
 go 1.19
 

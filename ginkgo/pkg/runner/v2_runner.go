@@ -3,15 +3,16 @@ package runner
 import (
 	"encoding/base64"
 	"fmt"
-	cmdpkg "ginkgo/pkg/cmdline"
 	"log"
 	"os"
 	"strings"
 	"time"
 
-	ginkgoResult "ginkgo/pkg/result"
-	ginkgoTestcase "ginkgo/pkg/testcase"
-	ginkgoUtil "ginkgo/pkg/util"
+	cmdpkg "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/cmdline"
+
+	ginkgoResult "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/result"
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/util"
 
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 )

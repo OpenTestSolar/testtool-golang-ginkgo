@@ -1,10 +1,11 @@
 package loader
 
 import (
-	"ginkgo/pkg/builder"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/builder"
 
 	"github.com/stretchr/testify/assert"
 )

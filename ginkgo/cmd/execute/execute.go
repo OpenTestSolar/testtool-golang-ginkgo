@@ -2,15 +2,16 @@ package execute
 
 import (
 	"errors"
-	ginkgoBuilder "ginkgo/pkg/builder"
-	ginkgoRunner "ginkgo/pkg/runner"
-	ginkgoTestcase "ginkgo/pkg/testcase"
-	ginkgoUtil "ginkgo/pkg/util"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	ginkgoBuilder "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/builder"
+	ginkgoRunner "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/runner"
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/util"
 
 	"github.com/OpenTestSolar/testtool-sdk-golang/api"
 	sdkClient "github.com/OpenTestSolar/testtool-sdk-golang/client"

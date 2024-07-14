@@ -2,12 +2,13 @@ package runner
 
 import (
 	"fmt"
-	ginkgoResult "ginkgo/pkg/result"
-	ginkgoUtil "ginkgo/pkg/util"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	ginkgoResult "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/result"
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/util"
 
 	"github.com/stretchr/testify/assert"
 )

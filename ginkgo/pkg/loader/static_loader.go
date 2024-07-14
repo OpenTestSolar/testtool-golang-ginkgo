@@ -2,7 +2,6 @@ package loader
 
 import (
 	"fmt"
-	ginkgoTestcase "ginkgo/pkg/testcase"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -11,6 +10,8 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
 
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 )

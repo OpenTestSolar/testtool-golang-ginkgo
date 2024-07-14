@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	ginkgoTestcase "ginkgo/pkg/testcase"
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
 )
 
 func ParseCaseByReg(proj string, output string, ginkgoVersion int) ([]*ginkgoTestcase.TestCase, error) {
