@@ -106,7 +106,8 @@ func findBinFile(absSelectorPath string) string {
 func ginkgo_v1_load(projPath, pkgBin string, ginkgoVersion int) ([]*ginkgoTestcase.TestCase, error) {
 	var caseList []*ginkgoTestcase.TestCase
 	cmdline := pkgBin + " --ginkgo.v --ginkgo.dryRun --ginkgo.noColor"
-	output, _, err := ginkgoUtil.RunCommandWithOutput(cmdline, projPath)
+	workDir := strings.TrimSuffix(pkgBin, ".test")
+	output, _, err := ginkgoUtil.RunCommandWithOutput(cmdline, workDir)
 	if err != nil {
 		log.Printf("Ginkgo dry run command exit code: %v", err)
 		return nil, err

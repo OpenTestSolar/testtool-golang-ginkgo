@@ -21,7 +21,8 @@ func RunGinkgoV1Test(projPath string, pkgBin string, filepath string, tcNames []
 	cmdline := pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.noColor --ginkgo.trace --ginkgo.reportFile="%s" --ginkgo.focus="%s" `, outputXmlFile, cmdpkg.GenTestCaseFocusName(tcNames))
 	log.Printf("Run cmdline %s", cmdline)
 	startTime := time.Now()
-	_, stderr, err := ginkgoUtil.RunCommandWithOutput(cmdline, projPath)
+	workDir := strings.TrimSuffix(pkgBin, ".test")
+	_, stderr, err := ginkgoUtil.RunCommandWithOutput(cmdline, workDir)
 	delta := time.Since(startTime)
 	log.Printf("Run test command cost %.2fs", delta.Seconds())
 	if err != nil {
