@@ -146,3 +146,10 @@ func TestGenRandomString(t *testing.T) {
 	got := GenRandomString(10)
 	assert.Equal(t, 10, len(got))
 }
+
+func TestFindGinkgoVersion(t *testing.T) {
+	testdata, err := filepath.Abs("../../testdata/")
+	assert.NoError(t, err)
+	version := FindGinkgoVersion(testdata)
+	assert.Equal(t, version, 2)
+}

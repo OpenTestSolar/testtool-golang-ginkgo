@@ -1,6 +1,7 @@
 package result
 
 import (
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -18,7 +19,9 @@ func ParseXmlResultFile(projPath string, path string) ([]*sdkModel.TestResult, e
 	if err != nil {
 		return testResults, err
 	}
-	doc, err := xmlquery.Parse(strings.NewReader(string(buff)))
+	content := string(buff)
+	log.Printf("result xml file content:\n%s", content)
+	doc, err := xmlquery.Parse(strings.NewReader(content))
 	if err != nil {
 		return testResults, err
 	}
@@ -49,7 +52,8 @@ func ParseXmlResultFile(projPath string, path string) ([]*sdkModel.TestResult, e
 		resultType := sdkModel.ResultTypeSucceed
 		skipped := testcase.SelectElement("/skipped")
 		if skipped != nil {
-			resultType = sdkModel.ResultTypeIgnored
+			log.Printf("case %s skipped", name)
+			continue
 		} else {
 			stdouts := testcase.SelectElements("/system-out")
 			for _, stdout := range stdouts {

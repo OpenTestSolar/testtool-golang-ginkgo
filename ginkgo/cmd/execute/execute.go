@@ -151,9 +151,10 @@ func executeTestcases(projPath string, packages map[string]map[string][]*ginkgoT
 			for i, tc := range cases {
 				tcNames[i] = tc.Name
 			}
+			ginkgoVersion := ginkgoUtil.FindGinkgoVersion(strings.TrimSuffix(pkgBin, ".test"))
 			log.Printf("Run test cases: %v by bin file %s", tcNames, pkgBin)
 			var results []*sdkModel.TestResult
-			if ginkgoVersion := ginkgoRunner.GetGinkgoVersion(cases); ginkgoVersion == "1" {
+			if ginkgoVersion == 1 {
 				results, err = ginkgoRunner.RunGinkgoV1Test(projPath, pkgBin, filepath.Join(path, filename), tcNames)
 			} else {
 				results, err = ginkgoRunner.RunGinkgoV2Test(projPath, pkgBin, filepath.Join(path, filename), tcNames)

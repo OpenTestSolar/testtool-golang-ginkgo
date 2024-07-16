@@ -65,19 +65,9 @@ func RunGinkgoV1Test(projPath string, pkgBin string, filepath string, tcNames []
 	if err != nil {
 		return testResults, err
 	}
-	nameMap := map[string]string{}
-	for _, name := range tcNames {
-		nameMap[strings.Replace(name, "/", " ", -1)] = name
-	}
-	for _, testResult := range testResults {
-		// Fix testcase file path
-		if _, ok := nameMap[testResult.Test.Name]; ok {
-			testResult.Test.Name = nameMap[testResult.Test.Name]
-		} else {
-			log.Printf("TestCase %s?%s not found", filepath, testResult.Test.Name)
-		}
-		testResult.Test.Attributes["description"] = testResult.Test.Name
-		testResult.Test.Name = filepath + "?" + testResult.Test.Name
+	for _, result := range testResults {
+		result.Test.Name = filepath + "?" + result.Test.Name
+		result.Test.Attributes["description"] = result.Test.Name
 	}
 	return testResults, nil
 }

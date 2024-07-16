@@ -3,6 +3,10 @@ package util
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"log"
 	"math/rand"
 	"os"
@@ -130,4 +134,51 @@ func GenRandomString(n int) string {
 		b[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
 	return string(b)
+}
+
+func FindGinkgoVersion(path string) (ginkgoVersion int) {
+	err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && strings.HasSuffix(info.Name(), "_test.go") {
+			version := checkGinkgoImportVersion(filePath)
+			if version > 0 {
+				ginkgoVersion = version
+				return filepath.SkipDir
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		fmt.Printf("Error searching for test files: %v\n", err)
+	}
+	return ginkgoVersion
+}
+
+func checkGinkgoImportVersion(file string) int {
+	fset := token.NewFileSet()
+	node, err := parser.ParseFile(fset, file, nil, parser.ImportsOnly)
+	if err != nil {
+		fmt.Printf("Error parsing file: %v\n", err)
+		return 0
+	}
+
+	version := 0
+	ast.Inspect(node, func(n ast.Node) bool {
+		importSpec, ok := n.(*ast.ImportSpec)
+		if ok && importSpec.Path != nil {
+			if importSpec.Path.Value == "\"github.com/onsi/ginkgo/v2\"" {
+				version = 2
+				return false
+			} else if importSpec.Path.Value == "\"github.com/onsi/ginkgo\"" {
+				version = 1
+				return false
+			}
+		}
+		return true
+	})
+
+	return version
 }
