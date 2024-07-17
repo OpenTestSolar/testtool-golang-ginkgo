@@ -60,7 +60,7 @@ func TestParseJsonToObj(t *testing.T) {
 func Test_parseCaseByReg(t *testing.T) {
 	byteValue, err := os.ReadFile("./testdata/dry_run_output.txt")
 	assert.NoError(t, err)
-	cases, err := ParseCaseByReg("data/workspace", string(byteValue), 2)
+	cases, err := ParseCaseByReg("data/workspace", string(byteValue), 2, "")
 	assert.NoError(t, err)
 	assert.Len(t, cases, 1)
 }

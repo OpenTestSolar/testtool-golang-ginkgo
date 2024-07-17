@@ -62,7 +62,7 @@ func ginkgo_v1_load(projPath, pkgBin string, ginkgoVersion int) ([]*ginkgoTestca
 		log.Printf("Ginkgo dry run command exit code: %v", err)
 		return nil, err
 	}
-	testcaseList, err := ginkgoResult.ParseCaseByReg(projPath, output, ginkgoVersion)
+	testcaseList, err := ginkgoResult.ParseCaseByReg(projPath, output, ginkgoVersion, "")
 	if err != nil {
 		log.Printf("find testcase in log error: %v", err)
 	}
@@ -91,7 +91,7 @@ func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgo
 	}
 	if exists, err := ginkgoUtil.FileExists(reportJson); err != nil || !exists {
 		log.Printf("dry run report json file not exists, try to parse cases by stdout")
-		testcaseList, errInfo := ginkgoResult.ParseCaseByReg(projPath, output, ginkgoVersion)
+		testcaseList, errInfo := ginkgoResult.ParseCaseByReg(projPath, output, ginkgoVersion, path)
 		if errInfo != nil {
 			log.Printf("find testcase in log error: %v", errInfo)
 		}
@@ -127,6 +127,7 @@ func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgo
 				Attributes: map[string]string{},
 			}
 			caseInfo.Attributes["ginkgoVersion"] = strconv.Itoa(2)
+			caseInfo.Attributes["path"] = path
 			caseList = append(caseList, caseInfo)
 		}
 	}

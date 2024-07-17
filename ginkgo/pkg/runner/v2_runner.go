@@ -105,7 +105,7 @@ func obtainExpectedExecuteCasesByDryRun(projPath, cmdline string) []*ginkgoTestc
 		log.Printf("execute regenerated dry run cmd err: %v", err)
 		return nil
 	}
-	testcaseList, err := ginkgoResult.ParseCaseByReg(projPath, output, 2)
+	testcaseList, err := ginkgoResult.ParseCaseByReg(projPath, output, 2, "")
 	if err != nil {
 		log.Printf("find testcase in log error: %v", err)
 		return nil
