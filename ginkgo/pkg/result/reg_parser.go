@@ -9,7 +9,7 @@ import (
 	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
 )
 
-func ParseCaseByReg(proj string, output string, ginkgoVersion int) ([]*ginkgoTestcase.TestCase, error) {
+func ParseCaseByReg(proj string, output string, ginkgoVersion int, packPath string) ([]*ginkgoTestcase.TestCase, error) {
 	var caseList []*ginkgoTestcase.TestCase
 	regexPattern := `(?s).*?Will run.*?specs(.*?)Ran.*?Specs in.*?seconds`
 	re := regexp.MustCompile(regexPattern)
@@ -68,6 +68,9 @@ func ParseCaseByReg(proj string, output string, ginkgoVersion int) ([]*ginkgoTes
 			}
 			fmt.Printf("find testcase : \n name: %v\n path: %v\n", name, path)
 			caseInfo.Attributes["ginkgoVersion"] = strconv.Itoa(ginkgoVersion)
+			if packPath != "" {
+				caseInfo.Attributes["path"] = packPath
+			}
 			caseList = append(caseList, caseInfo)
 		}
 	}
