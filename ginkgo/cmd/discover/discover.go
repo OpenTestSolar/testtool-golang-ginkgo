@@ -41,7 +41,7 @@ func NewCmdDiscover() *cobra.Command {
 	return &cmd
 }
 
-func parseTestSelectors(testSelector []string) []*ginkgoSelector.TestSelector {
+func ParseTestSelectors(testSelector []string) []*ginkgoSelector.TestSelector {
 	if len(testSelector) == 0 {
 		testSelector = []string{"."}
 	}
@@ -59,7 +59,7 @@ func parseTestSelectors(testSelector []string) []*ginkgoSelector.TestSelector {
 	return targetSelectors
 }
 
-func reportTestcases(testcases []*ginkgoTestcase.TestCase, loadErrors []*sdkModel.LoadError, reporter api.Reporter) error {
+func ReportTestcases(testcases []*ginkgoTestcase.TestCase, loadErrors []*sdkModel.LoadError, reporter api.Reporter) error {
 	var tests []*sdkModel.TestCase
 	for _, testcase := range testcases {
 		tests = append(tests, &sdkModel.TestCase{
@@ -77,7 +77,7 @@ func reportTestcases(testcases []*ginkgoTestcase.TestCase, loadErrors []*sdkMode
 	return nil
 }
 
-func loadTestcases(projPath string, targetSelectors []*ginkgoSelector.TestSelector) ([]*ginkgoTestcase.TestCase, []*sdkModel.LoadError) {
+func LoadTestcases(projPath string, targetSelectors []*ginkgoSelector.TestSelector) ([]*ginkgoTestcase.TestCase, []*sdkModel.LoadError) {
 	var testcases []*ginkgoTestcase.TestCase
 	var loadErrors []*sdkModel.LoadError
 	loadedSelectorPath := make(map[string]struct{})
@@ -99,19 +99,19 @@ func (o *DiscoverOptions) RunDiscover(cmd *cobra.Command) error {
 	if err != nil {
 		return pkgErrors.Wrapf(err, "failed to unmarshal case info")
 	}
-	targetSelectors := parseTestSelectors(config.TestSelectors)
+	targetSelectors := ParseTestSelectors(config.TestSelectors)
 	log.Printf("load testcases from selectors: %s", targetSelectors)
 	projPath := ginkgoUtil.GetWorkspace(config.ProjectPath)
 	_, err = os.Stat(projPath)
 	if err != nil {
 		return pkgErrors.Wrapf(err, "stat project path %s failed", projPath)
 	}
-	testcases, loadErrors := loadTestcases(projPath, targetSelectors)
+	testcases, loadErrors := LoadTestcases(projPath, targetSelectors)
 	reporter, err := sdkClient.NewReporterClient(config.FileReportPath)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reporter")
 	}
-	err = reportTestcases(testcases, loadErrors, reporter)
+	err = ReportTestcases(testcases, loadErrors, reporter)
 	if err != nil {
 		return errors.Wrapf(err, "failed to report testcases")
 	}

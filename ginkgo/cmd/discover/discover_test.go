@@ -29,7 +29,7 @@ func TestNewCmdDiscover(t *testing.T) {
 
 func TestParseTestSelectors(t *testing.T) {
 	testSelectors := []string{"path?name=test%20name&attr1=value%3D1"}
-	selectors := parseTestSelectors(testSelectors)
+	selectors := ParseTestSelectors(testSelectors)
 	assert.Len(t, selectors, 1)
 }
 
@@ -63,7 +63,7 @@ func TestReportTestcases(t *testing.T) {
 			Message: "",
 		},
 	}
-	err := reportTestcases(testcases, loadErrors, &MockReporterClient{})
+	err := ReportTestcases(testcases, loadErrors, &MockReporterClient{})
 	assert.NoError(t, err)
 }
 
@@ -94,13 +94,13 @@ func TestLoadTestcases(t *testing.T) {
 	}
 	projPath, err := filepath.Abs("../../testdata")
 	assert.NoError(t, err)
-	testcases, loadErrors := loadTestcases(projPath, testSelectors)
+	testcases, loadErrors := LoadTestcases(projPath, testSelectors)
 	assert.Len(t, testcases, 1)
 	assert.Len(t, loadErrors, 0)
 }
 
 func TestRunDiscover(t *testing.T) {
-	reportTestcasesMock := gomonkey.ApplyFunc(reportTestcases, func(testcases []*ginkgoTestcase.TestCase, loadErrors []*sdkModel.LoadError, reporter api.Reporter) error {
+	reportTestcasesMock := gomonkey.ApplyFunc(ReportTestcases, func(testcases []*ginkgoTestcase.TestCase, loadErrors []*sdkModel.LoadError, reporter api.Reporter) error {
 		return nil
 	})
 	defer reportTestcasesMock.Reset()
