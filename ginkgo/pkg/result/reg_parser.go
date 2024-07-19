@@ -1,6 +1,7 @@
 package result
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -68,6 +69,9 @@ func ParseCaseByReg(proj string, output string, ginkgoVersion int, packPath stri
 			}
 			fmt.Printf("find testcase : \n name: %v\n path: %v\n", name, path)
 			caseInfo.Attributes["ginkgoVersion"] = strconv.Itoa(ginkgoVersion)
+			if marshalNameList, err := json.Marshal(nameList); err == nil {
+				caseInfo.Attributes["nameList"] = string(marshalNameList)
+			}
 			if packPath != "" {
 				caseInfo.Attributes["path"] = packPath
 			}
