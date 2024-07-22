@@ -1,6 +1,9 @@
 package selector
 
-import "net/url"
+import (
+	"net/url"
+	"strings"
+)
 
 type TestSelector struct {
 	Value      string
@@ -16,25 +19,28 @@ func NewTestSelector(selector string) (*TestSelector, error) {
 	}
 	path := u.Path
 	rawQuery := u.RawQuery
-	query, _ := url.ParseQuery(rawQuery)
 	name := ""
 	attributes := map[string]string{}
-	for k, v := range query {
-		if k == "name" {
-			if len(v) == 1 {
-				name = v[0]
-			}
-		} else if len(v) == 1 && v[0] == "" {
-			if len(query) == 1 {
-				name = k
-			}
-		} else {
-			if len(v) >= 1 {
-				attributes[k] = v[0]
+	if !strings.Contains(rawQuery, "=") {
+		name = rawQuery
+	} else {
+		query, _ := url.ParseQuery(rawQuery)
+		for k, v := range query {
+			if k == "name" {
+				if len(v) == 1 {
+					name = v[0]
+				}
+			} else if len(v) == 1 && v[0] == "" {
+				if len(query) == 1 {
+					name = k
+				}
+			} else {
+				if len(v) >= 1 {
+					attributes[k] = v[0]
+				}
 			}
 		}
 	}
-
 	testSelector := &TestSelector{
 		Value:      selector,
 		Path:       path,

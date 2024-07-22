@@ -17,31 +17,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// func findTestSuiteDirs(absPath string) ([]string, error) {
-// 	var testDirs []string
-// 	visited := make(map[string]bool)
-// 	log.Printf("find test suite from directory: %s", absPath)
-// 	err := filepath.Walk(absPath, func(currentPath string, info os.FileInfo, err error) error {
-// 		if err != nil {
-// 			return err
-// 		}
-// 		if !info.IsDir() && strings.HasSuffix(info.Name(), "_test.go") {
-// 			dir := filepath.Dir(currentPath) // 获取文件所在的目录路径
-// 			if !visited[dir] {
-// 				visited[dir] = true
-// 				testDirs = append(testDirs, dir)
-// 			}
-// 		}
-// 		return nil
-// 	})
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return testDirs, nil
-// }
-
 func findBinFile(absSelectorPath string) string {
-	testFileName := filepath.Join(absSelectorPath + ".test")
+	testFileName := absSelectorPath + ".test"
 	_, err := os.Stat(testFileName)
 	if os.IsNotExist(err) {
 		return ""
@@ -57,6 +34,7 @@ func ginkgo_v1_load(projPath, pkgBin string, ginkgoVersion int) ([]*ginkgoTestca
 	var caseList []*ginkgoTestcase.TestCase
 	cmdline := pkgBin + " --ginkgo.v --ginkgo.dryRun --ginkgo.noColor"
 	workDir := strings.TrimSuffix(pkgBin, ".test")
+	log.Printf("dry run cmd: %s in dir: %s", cmdline, workDir)
 	output, _, err := ginkgoUtil.RunCommandWithOutput(cmdline, workDir)
 	if err != nil {
 		log.Printf("Ginkgo dry run command exit code: %v", err)
@@ -137,12 +115,6 @@ func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgo
 func dynamicLoadTestcase(projPath string, selectorPath string) ([]*ginkgoTestcase.TestCase, error) {
 	var caseList []*ginkgoTestcase.TestCase
 	absSelectorPath := filepath.Join(projPath, selectorPath)
-	// pathList, err := findTestSuiteDirs(absSelectorPath)
-	// if err != nil {
-	// 	log.Printf("find test suite dirs from %s failed: %v", selectorPath, err)
-	// 	return nil, err
-	// }
-	// log.Printf("find test suite dirs from %s: %v", selectorPath, pathList)
 	pkgBin := findBinFile(absSelectorPath)
 	if pkgBin == "" {
 		log.Printf("package bin file not exist, ignore load testcase")
