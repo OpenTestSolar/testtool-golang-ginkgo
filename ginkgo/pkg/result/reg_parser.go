@@ -22,7 +22,7 @@ func isValidSection(section, proj string) bool {
 		return false
 	} else if !strings.Contains(section, proj) {
 		return false
-	} else if strings.Contains(section, "[PENDING]") {
+	} else if strings.Contains(section, "PENDING") {
 		return false
 	}
 	return true
@@ -67,7 +67,7 @@ func ParseCaseByReg(proj string, output string, ginkgoVersion int, packPath stri
 			for i, line := range lines {
 				line = removeExtraSpace(i, line)
 				pathMatch := pathRegex.FindStringSubmatch(line)
-				if len(pathMatch) > 1 {
+				if len(pathMatch) > 1 && strings.Contains(line, proj) {
 					path = pathMatch[1]
 				} else if strings.Contains(line, "•") {
 					continue
