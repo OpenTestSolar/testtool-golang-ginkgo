@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 )
@@ -96,15 +97,22 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 		if spec.IsSetUpStage() && (!p.run || spec.State == "passed") {
 			continue
 		}
-		specName := spec.genarateSpecName()
-		if specName == "" {
+		containerName, leafName := spec.getContainerAndLeafName()
+		if containerName == "" && leafName == "" {
 			continue
+		}
+		specName := strings.Join([]string{containerName, leafName}, "/")
+		var nameList string
+		if marshalNameList, err := json.Marshal([]string{containerName, leafName}); err == nil {
+			nameList = string(marshalNameList)
 		}
 		steps := spec.GenerateSteps()
 		testResults = append(testResults, &sdkModel.TestResult{
 			Test: &sdkModel.TestCase{
-				Name:       spec.outputTestName(p.projPath, p.packPath, specName),
-				Attributes: map[string]string{}, //TODO:
+				Name: spec.outputTestName(p.projPath, p.packPath, specName),
+				Attributes: map[string]string{
+					"nameList": nameList,
+				},
 			},
 			StartTime:  spec.StartTime,
 			EndTime:    spec.EndTime,

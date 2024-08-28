@@ -82,26 +82,26 @@ type Spec struct {
 	ParallelProcess            int64
 }
 
-func (s *Spec) genarateSpecName() string {
-	var specName string
+func (s *Spec) getContainerAndLeafName() (string, string) {
+	var containerName string
+	var leafName string
 	if s.ContainerHierarchyTexts == nil {
-		specName = s.LeafNodeType
+		containerName = s.LeafNodeType
 	} else {
 		for _, name := range s.ContainerHierarchyTexts {
 			// ignore empty name
 			if strings.TrimSpace(name) == "" {
 				continue
 			}
-			if specName != "" && strings.TrimSpace(specName) != "" {
-				specName += " "
+			if containerName != "" && strings.TrimSpace(containerName) != "" {
+				containerName += " "
 			}
-			specName += name
+			containerName += name
 		}
 		// TODO: 确定具体分割符标识
-		specName += "/" + s.LeafNodeText
-		specName = addLabels(specName, s.ContainerHierarchyLabels, s.LeafNodeLabels)
+		leafName = addLabels(s.LeafNodeText, s.ContainerHierarchyLabels, s.LeafNodeLabels)
 	}
-	return specName
+	return containerName, leafName
 }
 
 func (s *Spec) getStepsByOutputLines(output string) []*sdkModel.TestCaseStep {
