@@ -102,7 +102,7 @@ func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgo
 			caseInfo := &ginkgoTestcase.TestCase{
 				Path:       casePath[0],
 				Name:       casePath[1],
-				Attributes: map[string]string{},
+				Attributes: result.Test.Attributes,
 			}
 			caseInfo.Attributes["ginkgoVersion"] = strconv.Itoa(2)
 			caseInfo.Attributes["path"] = path
