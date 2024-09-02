@@ -88,16 +88,7 @@ func (s *Spec) getContainerAndLeafName() (string, string) {
 	if s.ContainerHierarchyTexts == nil {
 		containerName = s.LeafNodeType
 	} else {
-		for _, name := range s.ContainerHierarchyTexts {
-			// ignore empty name
-			if strings.TrimSpace(name) == "" {
-				continue
-			}
-			if containerName != "" && strings.TrimSpace(containerName) != "" {
-				containerName += " "
-			}
-			containerName += name
-		}
+		containerName = strings.Join(s.ContainerHierarchyTexts, " ")
 		// TODO: 确定具体分割符标识
 		leafName = addLabels(s.LeafNodeText, s.ContainerHierarchyLabels, s.LeafNodeLabels)
 	}
