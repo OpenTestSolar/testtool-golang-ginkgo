@@ -158,7 +158,14 @@ func getAvailableSuitePath(projPath, rootPath string) ([]string, error) {
 			if packagePath == projPath {
 				packagePath = ""
 			} else {
-				packagePath = packagePath[len(projPath)+1:]
+				if relPath, err := filepath.Rel(projPath, packagePath); err != nil {
+					log.Printf("get rel path failed, basepath %s, targpath: %s, err: %v", projPath, packagePath, err)
+					relPath = strings.TrimPrefix(packagePath, projPath)
+					relPath = strings.TrimPrefix(relPath, "/")
+					packagePath = relPath
+				} else {
+					packagePath = relPath
+				}
 			}
 			if !ginkgoUtil.ElementIsInSlice(packagePath, packageList) {
 				packageList = append(packageList, packagePath)
