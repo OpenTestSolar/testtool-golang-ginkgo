@@ -104,7 +104,13 @@ func discoverExecutableTestcases(testcases []*ginkgoTestcase.TestCase) ([]*ginkg
 	for _, testcase := range testcases {
 		fd, err := os.Stat(testcase.Path)
 		if err != nil {
-			return nil, pkgErrors.Wrapf(err, "get file info %s failed", testcase.Path)
+			preCompileFile := filepath.Dir(testcase.Path) + ".test"
+			if _, err := os.Stat(preCompileFile); err != nil {
+				return nil, pkgErrors.Wrapf(err, "get file info %s failed and there is no precompiled binary file", testcase.Path)
+			}
+			log.Printf("[PLUGIN]can't find testcase file %s, but find precompiled binary file %s", testcase.Path, preCompileFile)
+			excutableTestcases = append(excutableTestcases, testcase)
+			continue
 		}
 		if !fd.IsDir() {
 			excutableTestcases = append(excutableTestcases, testcase)
@@ -200,7 +206,7 @@ func (o *ExecuteOptions) RunExecute(cmd *cobra.Command) error {
 	// 递归查询包含实际可执行用例的目录
 	excutableTestcases, err := discoverExecutableTestcases(testcases)
 	if err != nil {
-		return pkgErrors.Wrapf(err, "failed to discover excutble testcases")
+		return pkgErrors.Wrapf(err, "failed to discover excutable testcases")
 	}
 	projPath := ginkgoUtil.GetWorkspace(config.ProjectPath)
 	_, err = os.Stat(projPath)
