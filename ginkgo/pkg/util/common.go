@@ -40,11 +40,7 @@ func GetPathAndFileName(projPath, path string) (dir string, file string, err err
 		return "", "", errors.New("path is empty")
 	}
 	absPath := filepath.Join(projPath, path)
-	fileInfo, err := os.Stat(absPath)
-	if err != nil {
-		return "", "", err
-	}
-	if fileInfo.IsDir() {
+	if !strings.HasSuffix(absPath, ".go") {
 		return path, "", nil
 	} else {
 		relPath, err := filepath.Rel(projPath, filepath.Dir(absPath))

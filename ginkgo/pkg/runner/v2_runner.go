@@ -50,7 +50,7 @@ func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNam
 		cmdline := cmdArgs.GenerateCmdLineStr()
 		return cmdline
 	} else {
-		return pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report="%s" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus="%s$"`, jsonFileName, cmdpkg.GenTestCaseFocusName(tcNames, false))
+		return pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report="%s" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus="%s"`, jsonFileName, cmdpkg.GenTestCaseFocusName(tcNames, false))
 	}
 }
 

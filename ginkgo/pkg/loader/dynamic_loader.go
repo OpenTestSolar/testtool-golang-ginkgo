@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
 
+	ginkgoBuilder "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/builder"
 	ginkgoResult "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/result"
-
 	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
 	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/util"
 
@@ -50,23 +51,25 @@ func ginkgo_v1_load(projPath, pkgBin string, ginkgoVersion int) ([]*ginkgoTestca
 
 func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgoTestcase.TestCase, error) {
 	var caseList []*ginkgoTestcase.TestCase
-	reportJson := filepath.Join(path, "report.json")
-	if exists, err := ginkgoUtil.FileExists(reportJson); err != nil || exists {
-		if err != nil {
-			log.Printf("Check report.json file exists failed: %v", err)
+	var cmdline string
+	var workDir string
+	if pkgBin != "" {
+		cmdline = strings.Join([]string{pkgBin, "--ginkgo.v --ginkgo.dry-run --ginkgo.no-color --ginkgo.json-report=report.json"}, " ")
+		workDir = projPath
+	} else {
+		if _, err := exec.LookPath("ginkgo"); err != nil {
+			return nil, errors.Wrapf(err, "there is no test and ginkgo binary")
 		}
-		err := os.Remove(reportJson)
-		if err != nil {
-			log.Printf("Remove report.json file failed: %v", err)
-		}
+		cmdline = "ginkgo --v --dry-run --no-color --json-report=report.json ."
+		workDir = filepath.Join(projPath, path)
 	}
-	cmdline := pkgBin + fmt.Sprintf(" --ginkgo.v --ginkgo.dry-run --ginkgo.no-color --ginkgo.json-report=%s ", reportJson)
-	log.Printf("dry run cmd: %s", cmdline)
-	output, _, err := ginkgoUtil.RunCommandWithOutput(cmdline, projPath)
+	log.Printf("dry run cmd: %s\nwork directory: %s", cmdline, workDir)
+	output, _, err := ginkgoUtil.RunCommandWithOutput(cmdline, workDir)
 	if err != nil {
 		log.Printf("Ginkgo v2 dry run command exit code: %v", err)
 		return nil, err
 	}
+	reportJson := filepath.Join(workDir, "report.json")
 	if exists, err := ginkgoUtil.FileExists(reportJson); err != nil || !exists {
 		log.Printf("dry run report json file not exists, try to parse cases by stdout")
 		testcaseList, errInfo := ginkgoResult.ParseCaseByReg(projPath, output, ginkgoVersion, path)
@@ -117,8 +120,12 @@ func dynamicLoadTestcase(projPath string, selectorPath string) ([]*ginkgoTestcas
 	absSelectorPath := filepath.Join(projPath, selectorPath)
 	pkgBin := findBinFile(absSelectorPath)
 	if pkgBin == "" {
-		log.Printf("package bin file not exist, ignore load testcase")
-		return caseList, nil
+		log.Printf("Can't find package bin file %s during loading, try to build it...", pkgBin)
+		var err error
+		pkgBin, err = ginkgoBuilder.BuildTestPackage(projPath, selectorPath, false)
+		if err != nil {
+			log.Printf("Build package %s during loading failed, err: %s", selectorPath, err.Error())
+		}
 	}
 	ginkgoVersion := ginkgoUtil.FindGinkgoVersion(absSelectorPath)
 	log.Printf("load testcase by bin file %s under ginkgo %d", pkgBin, ginkgoVersion)
@@ -151,7 +158,14 @@ func getAvailableSuitePath(projPath, rootPath string) ([]string, error) {
 			if packagePath == projPath {
 				packagePath = ""
 			} else {
-				packagePath = packagePath[len(projPath)+1:]
+				if relPath, err := filepath.Rel(projPath, packagePath); err != nil {
+					log.Printf("get rel path failed, basepath %s, targpath: %s, err: %v", projPath, packagePath, err)
+					relPath = strings.TrimPrefix(packagePath, projPath)
+					relPath = strings.TrimPrefix(relPath, "/")
+					packagePath = relPath
+				} else {
+					packagePath = relPath
+				}
 			}
 			if !ginkgoUtil.ElementIsInSlice(packagePath, packageList) {
 				packageList = append(packageList, packagePath)
