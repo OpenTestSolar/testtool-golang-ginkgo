@@ -19,8 +19,6 @@ import (
 )
 
 func findBinFile(absSelectorPath string) string {
-	log.Print("try find bing file in: ")
-	ginkgoUtil.ListFiles(absSelectorPath)
 	testFileName := absSelectorPath + ".test"
 	_, err := os.Stat(testFileName)
 	if os.IsNotExist(err) {
@@ -128,17 +126,6 @@ func dynamicLoadTestcase(projPath string, selectorPath string) ([]*ginkgoTestcas
 	var caseList []*ginkgoTestcase.TestCase
 	var err error
 	absSelectorPath := filepath.Join(projPath, selectorPath)
-	absProjPath, err := filepath.Abs(projPath)
-	if err != nil {
-		return nil, err
-	}
-	log.Printf("find package bin file in project path: %s", absProjPath)
-	if files, err := ginkgoUtil.FindFilesWithSuffix(absProjPath, ".test"); err != nil {
-		log.Printf("Find files with suffix .test failed: %v", err)
-		return nil, err
-	} else {
-		log.Printf("Find files with suffix .test: %v", files)
-	}
 	pkgBin := findBinFile(absSelectorPath)
 	if pkgBin == "" {
 		log.Printf("Can't find package bin file %s during loading, try to build it...", pkgBin)

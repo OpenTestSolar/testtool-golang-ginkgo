@@ -195,18 +195,3 @@ func FindFilesWithSuffix(path, suffix string) ([]string, error) {
 	}
 	return files, nil
 }
-
-func ListFiles(dirPath string) error {
-	// 使用 ioutil.ReadDir 读取目录内容
-	files, err := os.ReadDir(dirPath)
-	if err != nil {
-		return err
-	}
-
-	// 遍历并打印目录内容
-	for _, file := range files {
-		log.Println(file.Name())
-	}
-
-	return nil
-}
