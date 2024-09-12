@@ -153,3 +153,11 @@ func TestFindGinkgoVersion(t *testing.T) {
 	version := FindGinkgoVersion(testdata)
 	assert.Equal(t, version, 2)
 }
+
+func TestFindFilesWithSuffix(t *testing.T) {
+	testdata, err := filepath.Abs("../../testdata/")
+	assert.NoError(t, err)
+	files, err := FindFilesWithSuffix(testdata, "test.go")
+	assert.NoError(t, err)
+	assert.Greater(t, len(files), 0)
+}

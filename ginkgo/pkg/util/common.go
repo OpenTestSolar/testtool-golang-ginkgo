@@ -178,3 +178,20 @@ func checkGinkgoImportVersion(file string) int {
 
 	return version
 }
+
+func FindFilesWithSuffix(path, suffix string) ([]string, error) {
+	var files []string
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && strings.HasSuffix(info.Name(), suffix) {
+			files = append(files, path)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return files, nil
+}
