@@ -19,6 +19,8 @@ import (
 )
 
 func findBinFile(absSelectorPath string) string {
+	log.Print("try find bing file in: ")
+	ginkgoUtil.ListFiles(absSelectorPath)
 	testFileName := absSelectorPath + ".test"
 	_, err := os.Stat(testFileName)
 	if os.IsNotExist(err) {
