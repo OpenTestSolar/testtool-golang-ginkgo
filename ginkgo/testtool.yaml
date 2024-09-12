@@ -3,7 +3,7 @@ name: ginkgo
 nameZh: Ginkgo自动化测试工具
 lang: golang
 langType: COMPILED
-version: '0.2.14'
+version: '0.2.16'
 description: Ginkgo自动化测试工具
 defaultBaseImage: golang:1.22
 scaffoldRepo: https://github.com/OpenTestSolar/testtool-scaffold-ginkgo
@@ -28,8 +28,10 @@ parameterDefs:
     choices:
       - desc: 是
         value: 'true'
+        displayName: 是
       - desc: 否
         value: 'false'
+        displayName: 否
     inputWidget: choices
   - name: withLabels
     default: "false"
@@ -38,8 +40,10 @@ parameterDefs:
     choices:
       - desc: 是
         value: 'true'
+        displayName: 是
       - desc: 否
         value: 'false'
+        displayName: 否
     inputWidget: choices
   - name: splitBySpace
     default: "false"
@@ -48,8 +52,10 @@ parameterDefs:
     choices:
       - desc: 是
         value: 'true'
+        displayName: 是
       - desc: 否
         value: 'false'
+        displayName: 否
     inputWidget: choices
   - name: concurrentBuild
     default: "false"
@@ -58,8 +64,10 @@ parameterDefs:
     choices:
       - desc: 是
         value: 'true'
+        displayName: 是
       - desc: 否
         value: 'false'
+        displayName: 否
     inputWidget: choices
   - name: compressBinary
     default: "false"
@@ -68,8 +76,10 @@ parameterDefs:
     choices:
       - desc: 是
         value: 'true'
+        displayName: 是
       - desc: 否
         value: 'false'
+        displayName: 否
     inputWidget: choices
 supportOS:
   - windows
