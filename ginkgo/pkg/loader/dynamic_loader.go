@@ -22,14 +22,7 @@ func findBinFile(absSelectorPath string) string {
 	testFileName := absSelectorPath + ".test"
 	_, err := os.Stat(testFileName)
 	if os.IsNotExist(err) {
-		// 查看absSelectorPath这个目录下是否存在文件扩展名为`.test`的文件
-		if binFiles, err := ginkgoUtil.FindFilesWithSuffix(absSelectorPath, ".test"); err != nil {
-			return ""
-		} else if len(binFiles) == 0 {
-			return ""
-		} else {
-			return binFiles[0]
-		}
+		return ""
 	}
 	absPath, err := filepath.Abs(testFileName)
 	if err != nil {

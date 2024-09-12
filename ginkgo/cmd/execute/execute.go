@@ -68,6 +68,7 @@ func groupTestCasesByPathAndName(projPath string, testcases []*ginkgoTestcase.Te
 
 func reportTestResults(testResults []*sdkModel.TestResult, reporter api.Reporter) error {
 	for _, result := range testResults {
+		log.Printf("[PLUGIN]report testresult %s", result.Test.Name)
 		err := reporter.ReportCaseResult(result)
 		if err != nil {
 			return pkgErrors.Wrap(err, "failed to report load result")
