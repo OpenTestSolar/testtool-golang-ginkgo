@@ -126,7 +126,19 @@ func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgo
 
 func dynamicLoadTestcase(projPath string, selectorPath string) ([]*ginkgoTestcase.TestCase, error) {
 	var caseList []*ginkgoTestcase.TestCase
+	var err error
 	absSelectorPath := filepath.Join(projPath, selectorPath)
+	absProjPath, err := filepath.Abs(projPath)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("find package bin file in project path: %s", absProjPath)
+	if files, err := ginkgoUtil.FindFilesWithSuffix(absProjPath, ".test"); err != nil {
+		log.Printf("Find files with suffix .test failed: %v", err)
+		return nil, err
+	} else {
+		log.Printf("Find files with suffix .test: %v", files)
+	}
 	pkgBin := findBinFile(absSelectorPath)
 	if pkgBin == "" {
 		log.Printf("Can't find package bin file %s during loading, try to build it...", pkgBin)
@@ -138,7 +150,6 @@ func dynamicLoadTestcase(projPath string, selectorPath string) ([]*ginkgoTestcas
 	}
 	ginkgoVersion := ginkgoUtil.FindGinkgoVersion(absSelectorPath)
 	log.Printf("load testcase by bin file %s under ginkgo %d", pkgBin, ginkgoVersion)
-	var err error
 	var testcaseList []*ginkgoTestcase.TestCase
 	if ginkgoVersion == 2 {
 		testcaseList, err = ginkgo_v2_load(projPath, selectorPath, pkgBin, ginkgoVersion)
