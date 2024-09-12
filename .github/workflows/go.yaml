@@ -28,7 +28,6 @@ jobs:
           sudo apt-get install -y upx
       - name: Get dependencies
         run: |
-          cd ginkgo
           go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
           go mod download
       - name: golangci-lint
