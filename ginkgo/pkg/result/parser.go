@@ -64,7 +64,7 @@ func (p *ResultParser) GetPanicSuite() (*Spec, error) {
 		fmt.Print("no valid suite in results")
 		return nil, fmt.Errorf("no valid suite in results")
 	}
-	return suite.getSyncBefSuiteFailedSpec(), nil
+	return suite.getBefSuiteFailedSpec(), nil
 }
 
 func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {

@@ -249,9 +249,12 @@ type Suite struct {
 	SpecReports []*Spec
 }
 
-func (s *Suite) getSyncBefSuiteFailedSpec() *Spec {
+func (s *Suite) getBefSuiteFailedSpec() *Spec {
 	for _, spec := range s.SpecReports {
 		if spec.LeafNodeType == "SynchronizedBeforeSuite" && spec.ParallelProcess == 1 && spec.State != "passed" {
+			return spec
+		}
+		if spec.LeafNodeType == "BeforeSuite" && (spec.State == "failed" || spec.State == "panicked") {
 			return spec
 		}
 	}
