@@ -26,10 +26,11 @@ func TestNewCmdExecute(t *testing.T) {
 }
 
 func TestParseTestcases(t *testing.T) {
-	testSelectors := []string{"path?name=test%20name&attr1=value%3D1"}
-	testcases, err := parseTestcases(testSelectors)
+	testSelectors := []string{"path?name=test%20name&attr1=value%3D1", "path?name=test%20name&attr1=value%"}
+	testcases, parseFailedResults, err := parseTestcases(testSelectors)
 	assert.NoError(t, err)
 	assert.Len(t, testcases, 1)
+	assert.Len(t, parseFailedResults, 1)
 }
 
 type MockReporterClient struct{}

@@ -30,7 +30,10 @@ func ParseTestCaseBySelector(selector string) (*TestCase, error) {
 	}
 	path := u.Path
 	rawQuery := u.RawQuery
-	query, _ := url.ParseQuery(rawQuery)
+	query, err := url.ParseQuery(rawQuery)
+	if err != nil {
+		return nil, err
+	}
 	name := ""
 	attributes := map[string]string{}
 	for k, v := range query {

@@ -2,11 +2,13 @@ package execute
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	ginkgoBuilder "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/builder"
 	ginkgoRunner "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/runner"
@@ -68,6 +70,7 @@ func groupTestCasesByPathAndName(projPath string, testcases []*ginkgoTestcase.Te
 
 func reportTestResults(testResults []*sdkModel.TestResult, reporter api.Reporter) error {
 	for _, result := range testResults {
+		log.Printf("[PLUGIN]try to report testresult %s", result.Test.Name)
 		err := reporter.ReportCaseResult(result)
 		if err != nil {
 			return pkgErrors.Wrap(err, "failed to report load result")
@@ -178,20 +181,31 @@ func executeTestcases(projPath string, packages map[string]map[string][]*ginkgoT
 	return testResults, nil
 }
 
-func parseTestcases(testSelectors []string) ([]*ginkgoTestcase.TestCase, error) {
+func parseTestcases(testSelectors []string) ([]*ginkgoTestcase.TestCase, []*sdkModel.TestResult, error) {
 	var testcases []*ginkgoTestcase.TestCase
+	var failedResults []*sdkModel.TestResult
 	for _, selector := range testSelectors {
 		testcase, err := ginkgoTestcase.ParseTestCaseBySelector(selector)
 		if err != nil {
-			log.Printf("parse testcase by selector [%s] failed, err: %s", selector, err.Error())
+			message := fmt.Sprintf("parse testcase [%s] failed, err: %s", selector, err.Error())
+			log.Printf("[PLUGIN] %s", message)
+			failedResults = append(failedResults, &sdkModel.TestResult{
+				Test: &sdkModel.TestCase{
+					Name: selector,
+				},
+				ResultType: sdkModel.ResultTypeFailed,
+				Message:    message,
+				StartTime:  time.Now(),
+				EndTime:    time.Now(),
+			})
 			continue
 		}
 		testcases = append(testcases, testcase)
 	}
 	if len(testcases) == 0 {
-		return nil, errors.New("no available testcases")
+		return nil, nil, errors.New("no available testcases")
 	}
-	return testcases, nil
+	return testcases, failedResults, nil
 }
 
 func (o *ExecuteOptions) RunExecute(cmd *cobra.Command) error {
@@ -199,7 +213,7 @@ func (o *ExecuteOptions) RunExecute(cmd *cobra.Command) error {
 	if err != nil {
 		return pkgErrors.Wrapf(err, "failed to unmarshal case info")
 	}
-	testcases, err := parseTestcases(config.TestSelectors)
+	testcases, parseFailedResults, err := parseTestcases(config.TestSelectors)
 	if err != nil {
 		return pkgErrors.Wrapf(err, "failed to parse test selectors")
 	}
@@ -224,6 +238,9 @@ func (o *ExecuteOptions) RunExecute(cmd *cobra.Command) error {
 	reporter, err := sdkClient.NewReporterClient(config.FileReportPath)
 	if err != nil {
 		return pkgErrors.Wrap(err, "failed to create reporter")
+	}
+	if len(parseFailedResults) != 0 {
+		testResults = append(testResults, parseFailedResults...)
 	}
 	err = reportTestResults(testResults, reporter)
 	if err != nil {
