@@ -142,8 +142,11 @@ func TestExecuteTestcases(t *testing.T) {
 func Test_discoverExecutableTestcases(t *testing.T) {
 	projPath, err := filepath.Abs("../../testdata")
 	assert.NoError(t, err)
+	curWd, err := os.Getwd()
+	assert.NoError(t, err)
 	err = os.Chdir(projPath)
 	assert.NoError(t, err)
+	defer os.Chdir(curWd)
 	// 验证可以基于指定目录路径找到路径下对应的所有包含测试用例的子目录
 	testcases := []*testcase.TestCase{
 		{
@@ -178,4 +181,34 @@ func Test_discoverExecutableTestcases(t *testing.T) {
 	execTestcases, err = discoverExecutableTestcases(testcases)
 	assert.NoError(t, err)
 	assert.Len(t, execTestcases, 1)
+}
+
+func Test_findCompileBinary(t *testing.T) {
+	result := findCompileBinary("path")
+	assert.Equal(t, "", result)
+	result = findCompileBinary("/path/to/file")
+	assert.Equal(t, "", result)
+	result = findCompileBinary("path/to/file")
+	assert.Equal(t, "", result)
+	result = findCompileBinary("path\\to\\file")
+	assert.Equal(t, "", result)
+	result = findCompileBinary("")
+	assert.Equal(t, "", result)
+	result = findCompileBinary("/")
+	assert.Equal(t, "", result)
+	result = findCompileBinary("//")
+	assert.Equal(t, "", result)
+	result = findCompileBinary("\\")
+	assert.Equal(t, "", result)
+	// 测试存在二进制文件场景
+	projPath, err := filepath.Abs("../../testdata")
+	assert.NoError(t, err)
+	binFile := filepath.Join(projPath, "demo01.test")
+	_, err = os.Create(binFile)
+	assert.NoError(t, err)
+	defer os.Remove(binFile)
+	result = findCompileBinary(filepath.Join(projPath, "demo01"))
+	assert.Equal(t, binFile, result)
+	result = findCompileBinary(filepath.Join(projPath, "demo01", "test"))
+	assert.Equal(t, binFile, result)
 }
