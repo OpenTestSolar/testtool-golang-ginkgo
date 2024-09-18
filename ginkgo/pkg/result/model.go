@@ -99,6 +99,12 @@ func (s *Spec) getStepsByOutputLines(output string) []*sdkModel.TestCaseStep {
 	outputs := splitByNewline(output)
 	var steps []*sdkModel.TestCaseStep
 	var lineIndex int
+	var resultType sdkModel.ResultType
+	if s.IsFailed() {
+		resultType = sdkModel.ResultTypeFailed
+	} else {
+		resultType = sdkModel.ResultTypeSucceed
+	}
 	for _, entry := range s.ReportEntries {
 		if !entry.isValidEntry() {
 			continue
@@ -129,10 +135,11 @@ func (s *Spec) getStepsByOutputLines(output string) []*sdkModel.TestCaseStep {
 			lineIndex++
 		}
 		steps = append(steps, &sdkModel.TestCaseStep{
-			StartTime: entry.Time,
-			EndTime:   entry.Time.Add(time.Second * time.Duration(stepInfo.Duration)),
-			Title:     stepInfo.Text,
-			Logs:      logs,
+			StartTime:  entry.Time,
+			EndTime:    entry.Time.Add(time.Second * time.Duration(stepInfo.Duration)),
+			Title:      stepInfo.Text,
+			Logs:       logs,
+			ResultType: resultType,
 		})
 	}
 	return steps
