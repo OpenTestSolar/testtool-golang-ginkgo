@@ -146,7 +146,7 @@ func Test_discoverExecutableTestcases(t *testing.T) {
 	assert.NoError(t, err)
 	err = os.Chdir(projPath)
 	assert.NoError(t, err)
-	defer os.Chdir(curWd)
+	defer os.Chdir(curWd) //nolint:all
 	// 验证可以基于指定目录路径找到路径下对应的所有包含测试用例的子目录
 	testcases := []*testcase.TestCase{
 		{
