@@ -213,8 +213,9 @@ func (s *Spec) generateFailureStep() *sdkModel.TestCaseStep {
 				Content: content,
 			})
 		}
+		return &step
 	}
-	return &step
+	return nil
 }
 
 func (s *Spec) outputTestName(projectPath, packPath, specName string) string {
