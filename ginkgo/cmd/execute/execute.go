@@ -102,16 +102,37 @@ func findTestPackagesByPath(path string) ([]string, error) {
 	return subDirs, nil
 }
 
+// findCompileBinary 通过用例路径查询对应二进制可执行文件
+// 通常情况下预编译生成的二进制文件与用例文件所在目录同级
+// 但是部分场景下二进制文件可能处于更上层目录，需要递归查询
+func findCompileBinary(path string) string {
+	for {
+		preCompileFile := path + ".test"
+		if _, err := os.Stat(preCompileFile); err != nil {
+			path = filepath.Dir(path)
+			if path == "." || path == "/" || path == "\\" {
+				break
+			} else {
+				continue
+			}
+		} else {
+			return preCompileFile
+		}
+	}
+	return ""
+}
+
 func discoverExecutableTestcases(testcases []*ginkgoTestcase.TestCase) ([]*ginkgoTestcase.TestCase, error) {
 	excutableTestcases := []*ginkgoTestcase.TestCase{}
 	for _, testcase := range testcases {
 		fd, err := os.Stat(testcase.Path)
 		if err != nil {
-			preCompileFile := filepath.Dir(testcase.Path) + ".test"
-			if _, err := os.Stat(preCompileFile); err != nil {
+			preCompileFile := findCompileBinary(filepath.Dir(testcase.Path))
+			if preCompileFile == "" {
 				return nil, pkgErrors.Wrapf(err, "get file info %s failed and there is no precompiled binary file", testcase.Path)
 			}
 			log.Printf("[PLUGIN]can't find testcase file %s, but find precompiled binary file %s", testcase.Path, preCompileFile)
+			testcase.Path = strings.TrimSuffix(preCompileFile, ".test")
 			excutableTestcases = append(excutableTestcases, testcase)
 			continue
 		}
