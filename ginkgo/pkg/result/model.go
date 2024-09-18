@@ -143,10 +143,13 @@ func (s *Spec) generateDefaultStep(stderr string, stdout string) *sdkModel.TestC
 	stdouts := splitByNewline(stdout)
 	logs := make([]*sdkModel.TestCaseLog, 0)
 	var level sdkModel.LogLevel
+	var resultType sdkModel.ResultType
 	if s.IsFailed() {
 		level = sdkModel.LogLevelError
+		resultType = sdkModel.ResultTypeFailed
 	} else {
 		level = sdkModel.LogLevelInfo
+		resultType = sdkModel.ResultTypeSucceed
 	}
 	appendLog := func(lines []string) {
 		for _, line := range lines {
@@ -165,10 +168,11 @@ func (s *Spec) generateDefaultStep(stderr string, stdout string) *sdkModel.TestC
 		appendLog(stderrs)
 	}
 	return &sdkModel.TestCaseStep{
-		StartTime: s.StartTime,
-		EndTime:   s.EndTime,
-		Title:     "stdout/stderr",
-		Logs:      logs,
+		StartTime:  s.StartTime,
+		EndTime:    s.EndTime,
+		Title:      "stdout/stderr",
+		Logs:       logs,
+		ResultType: resultType,
 	}
 }
 
