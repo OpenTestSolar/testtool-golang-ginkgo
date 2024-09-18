@@ -142,29 +142,27 @@ func (s *Spec) generateDefaultStep(stderr string, stdout string) *sdkModel.TestC
 	stderrs := splitByNewline(stderr)
 	stdouts := splitByNewline(stdout)
 	logs := make([]*sdkModel.TestCaseLog, 0)
-	if len(stdouts) != 0 {
-		for _, line := range stdouts {
-			if line != "" {
-				logs = append(logs, &sdkModel.TestCaseLog{
-					Level:   sdkModel.LogLevelInfo,
-					Content: line,
-				})
-			}
-		}
+	var level sdkModel.LogLevel
+	if s.IsFailed() {
+		level = sdkModel.LogLevelError
+	} else {
+		level = sdkModel.LogLevelInfo
 	}
-	if len(stderrs) != 0 {
-		for _, line := range stderrs {
+	appendLog := func(lines []string) {
+		for _, line := range lines {
 			if line != "" {
-				level := sdkModel.LogLevelInfo
-				if strings.HasPrefix(line, "E") {
-					level = sdkModel.LogLevelError
-				}
 				logs = append(logs, &sdkModel.TestCaseLog{
 					Level:   level,
 					Content: line,
 				})
 			}
 		}
+	}
+	if len(stdouts) != 0 {
+		appendLog(stdouts)
+	}
+	if len(stderrs) != 0 {
+		appendLog(stderrs)
 	}
 	return &sdkModel.TestCaseStep{
 		StartTime: s.StartTime,
@@ -240,6 +238,13 @@ func (s *Spec) GenerateSteps() []*sdkModel.TestCaseStep {
 
 func (s *Spec) IsSetUpStage() bool {
 	if s.LeafNodeType == "BeforeSuite" || s.LeafNodeType == "SynchronizedBeforeSuite" || s.LeafNodeType == "SynchronizedAfterSuite" || s.LeafNodeType == "AfterSuite" || s.LeafNodeType == "ReportAfterSuite" {
+		return true
+	}
+	return false
+}
+
+func (s *Spec) IsFailed() bool {
+	if s.State == "failed" || s.State == "panicked" {
 		return true
 	}
 	return false
