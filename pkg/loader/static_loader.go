@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
 
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 )

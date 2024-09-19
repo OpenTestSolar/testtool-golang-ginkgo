@@ -4,10 +4,10 @@ import (
 	"log"
 	"os"
 
-	ginkgoLoader "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/loader"
-	ginkgoSelector "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/selector"
-	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
-	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/util"
+	ginkgoLoader "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/loader"
+	ginkgoSelector "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/selector"
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/util"
 
 	"github.com/OpenTestSolar/testtool-sdk-golang/api"
 	sdkClient "github.com/OpenTestSolar/testtool-sdk-golang/client"

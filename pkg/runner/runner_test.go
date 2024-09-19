@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	ginkgoResult "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/result"
-	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/util"
+	ginkgoResult "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/result"
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/util"
 
 	"github.com/stretchr/testify/assert"
 )

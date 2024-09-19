@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
+	"github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
 
 	sdkApi "github.com/OpenTestSolar/testtool-sdk-golang/api"
 	sdkClient "github.com/OpenTestSolar/testtool-sdk-golang/client"

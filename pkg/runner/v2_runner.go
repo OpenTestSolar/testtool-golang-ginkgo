@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
-	cmdpkg "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/cmdline"
+	cmdpkg "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/cmdline"
 
-	ginkgoResult "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/result"
-	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
-	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/util"
+	ginkgoResult "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/result"
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/util"
 
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 )

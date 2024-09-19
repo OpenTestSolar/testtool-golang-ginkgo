@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	ginkgoBuilder "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/builder"
-	ginkgoRunner "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/runner"
-	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
-	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/util"
+	ginkgoBuilder "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/builder"
+	ginkgoRunner "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/runner"
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/util"
 
 	"github.com/OpenTestSolar/testtool-sdk-golang/api"
 	sdkClient "github.com/OpenTestSolar/testtool-sdk-golang/client"
