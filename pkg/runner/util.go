@@ -4,7 +4,7 @@ import (
 	"log"
 	"os/exec"
 
-	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
 )
 
 func GetGinkgoVersion(testcases []*ginkgoTestcase.TestCase) string {

@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"strings"
 
-	ginkgoBuilder "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/builder"
-	ginkgoResult "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/result"
-	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
-	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/util"
+	ginkgoBuilder "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/builder"
+	ginkgoResult "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/result"
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/util"
 
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 	"github.com/pkg/errors"
@@ -36,14 +36,18 @@ func ginkgo_v1_load(projPath, pkgBin string, ginkgoVersion int) ([]*ginkgoTestca
 	cmdline := pkgBin + " --ginkgo.v --ginkgo.dryRun --ginkgo.noColor"
 	workDir := strings.TrimSuffix(pkgBin, ".test")
 	log.Printf("dry run cmd: %s in dir: %s", cmdline, workDir)
-	output, _, err := ginkgoUtil.RunCommandWithOutput(cmdline, workDir)
+	stdout, stderr, err := ginkgoUtil.RunCommandWithOutput(cmdline, workDir)
 	if err != nil {
-		log.Printf("Ginkgo dry run command exit code: %v", err)
+		log.Printf("Ginkgo dry run command failed, err: %v", err)
 		return nil, err
 	}
-	testcaseList, err := ginkgoResult.ParseCaseByReg(projPath, output, ginkgoVersion, "")
+	testcaseList, err := ginkgoResult.ParseCaseByReg(projPath, stdout, ginkgoVersion, "")
 	if err != nil {
 		log.Printf("find testcase in log error: %v", err)
+		return nil, fmt.Errorf("failed to parse testcases from ginkgo stdout: %s, err: %v", stdout, err)
+	}
+	if len(testcaseList) == 0 && stderr != "" {
+		return nil, fmt.Errorf("failed to parse testcases from ginkgo stdout: %s, stderr: %s", stdout, stderr)
 	}
 	caseList = append(caseList, testcaseList...)
 	return caseList, nil
@@ -64,17 +68,20 @@ func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgo
 		workDir = filepath.Join(projPath, path)
 	}
 	log.Printf("dry run cmd: %s\nwork directory: %s", cmdline, workDir)
-	output, _, err := ginkgoUtil.RunCommandWithOutput(cmdline, workDir)
+	stdout, stderr, err := ginkgoUtil.RunCommandWithOutput(cmdline, workDir)
 	if err != nil {
-		log.Printf("Ginkgo v2 dry run command exit code: %v", err)
+		log.Printf("Ginkgo v2 dry run command failed, err: %v", err)
 		return nil, err
 	}
 	reportJson := filepath.Join(workDir, "report.json")
 	if exists, err := ginkgoUtil.FileExists(reportJson); err != nil || !exists {
 		log.Printf("dry run report json file not exists, try to parse cases by stdout")
-		testcaseList, errInfo := ginkgoResult.ParseCaseByReg(projPath, output, ginkgoVersion, path)
+		testcaseList, errInfo := ginkgoResult.ParseCaseByReg(projPath, stdout, ginkgoVersion, path)
 		if errInfo != nil {
-			log.Printf("find testcase in log error: %v", errInfo)
+			return nil, fmt.Errorf("find testcase in log failed, err: %v, stderr: %s", errInfo, stderr)
+		}
+		if len(testcaseList) == 0 {
+			return nil, fmt.Errorf("can't find testcases from stdout: %s, stderr: %s", stdout, stderr)
 		}
 		caseList = append(caseList, testcaseList...)
 		if caseList != nil {

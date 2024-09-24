@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/util"
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/util"
 
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 	"github.com/antchfx/xmlquery"

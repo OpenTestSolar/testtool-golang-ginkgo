@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"testing"
 
-	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/testcase"
+	ginkgoTestcase "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/testcase"
 
 	"github.com/stretchr/testify/assert"
 )

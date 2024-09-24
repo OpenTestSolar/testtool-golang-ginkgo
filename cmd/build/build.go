@@ -1,7 +1,7 @@
 package build
 
 import (
-	ginkgoBuilder "github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/builder"
+	ginkgoBuilder "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/builder"
 
 	"github.com/spf13/cobra"
 )

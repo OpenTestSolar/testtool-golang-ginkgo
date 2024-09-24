@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/OpenTestSolar/testtool-golang-ginkgo/ginkgo/pkg/builder"
+	"github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/builder"
 	"github.com/agiledragon/gomonkey/v2"
 	"github.com/stretchr/testify/assert"
 )
