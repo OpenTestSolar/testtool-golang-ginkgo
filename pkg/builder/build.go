@@ -125,7 +125,7 @@ func BuildTestPackage(projPath string, packagePath string, compress bool) (strin
 		func() error {
 			_, stderr, err := ginkgoUtil.RunCommandWithOutput(cmdline, projPath)
 			if err != nil {
-				log.Printf("Build package %s failed: %s, err: %s", packagePath, stderr, err.Error())
+				log.Printf("Build package %s failed, stderr: %s, err: %s", packagePath, stderr, err.Error())
 				return err
 			}
 			_, err = os.Stat(pkgBin)

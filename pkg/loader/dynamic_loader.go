@@ -31,29 +31,39 @@ func findBinFile(absSelectorPath string) string {
 	return absPath
 }
 
-func ginkgo_v1_load(projPath, pkgBin string, ginkgoVersion int) ([]*ginkgoTestcase.TestCase, error) {
+func ginkgo_v1_load(projPath, pkgBin string) ([]*ginkgoTestcase.TestCase, error) {
 	var caseList []*ginkgoTestcase.TestCase
-	cmdline := pkgBin + " --ginkgo.v --ginkgo.dryRun --ginkgo.noColor"
+	var cmdline string
 	workDir := strings.TrimSuffix(pkgBin, ".test")
+	if pkgBin != "" {
+		cmdline = strings.Join([]string{pkgBin, "--ginkgo.v --ginkgo.dryRun --ginkgo.noColor"}, " ")
+	} else {
+		if _, err := exec.LookPath("ginkgo"); err != nil {
+			return nil, errors.Wrapf(err, "there is no test and ginkgo binary")
+		}
+		cmdline = "ginkgo --v --dry-run --no-color ."
+	}
 	log.Printf("dry run cmd: %s in dir: %s", cmdline, workDir)
 	stdout, stderr, err := ginkgoUtil.RunCommandWithOutput(cmdline, workDir)
 	if err != nil {
-		log.Printf("Ginkgo dry run command failed, err: %v", err)
-		return nil, err
+		message := fmt.Sprintf("dry run command failed, cmdline: %s, err: %v, stdout: %s, stderr: %s", cmdline, err, stdout, stderr)
+		log.Println(message)
+		return nil, errors.New(message)
 	}
-	testcaseList, err := ginkgoResult.ParseCaseByReg(projPath, stdout, ginkgoVersion, "")
+	testcaseList, err := ginkgoResult.ParseCaseByReg(projPath, stdout, 1, "")
 	if err != nil {
-		log.Printf("find testcase in log error: %v", err)
-		return nil, fmt.Errorf("failed to parse testcases from ginkgo stdout: %s, err: %v", stdout, err)
+		message := fmt.Sprintf("find testcase from stdout failed, err: %v, stdout: %s, stderr: %s", err, stdout, stderr)
+		log.Printf(message)
+		return nil, errors.New(message)
 	}
-	if len(testcaseList) == 0 && stderr != "" {
-		return nil, fmt.Errorf("failed to parse testcases from ginkgo stdout: %s, stderr: %s", stdout, stderr)
+	if len(testcaseList) == 0 {
+		return nil, fmt.Errorf("failed to find testcases from stdout, stdout: %s, stderr: %s", stdout, stderr)
 	}
 	caseList = append(caseList, testcaseList...)
 	return caseList, nil
 }
 
-func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgoTestcase.TestCase, error) {
+func ginkgo_v2_load(projPath, path, pkgBin string) ([]*ginkgoTestcase.TestCase, error) {
 	var caseList []*ginkgoTestcase.TestCase
 	var cmdline string
 	var workDir string
@@ -70,40 +80,29 @@ func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgo
 	log.Printf("dry run cmd: %s\nwork directory: %s", cmdline, workDir)
 	stdout, stderr, err := ginkgoUtil.RunCommandWithOutput(cmdline, workDir)
 	if err != nil {
-		log.Printf("Ginkgo v2 dry run command failed, err: %v", err)
-		return nil, err
+		return nil, fmt.Errorf("dry run command %s failed, err: %v", cmdline, err)
 	}
 	reportJson := filepath.Join(workDir, "report.json")
 	if exists, err := ginkgoUtil.FileExists(reportJson); err != nil || !exists {
 		log.Printf("dry run report json file not exists, try to parse cases by stdout")
-		testcaseList, errInfo := ginkgoResult.ParseCaseByReg(projPath, stdout, ginkgoVersion, path)
+		testcaseList, errInfo := ginkgoResult.ParseCaseByReg(projPath, stdout, 2, path)
 		if errInfo != nil {
-			return nil, fmt.Errorf("find testcase in log failed, err: %v, stderr: %s", errInfo, stderr)
+			return nil, errors.Wrapf(err, "find testcase from stdout failed, stdout: %s, stderr: %s", stdout, stderr)
 		}
 		if len(testcaseList) == 0 {
 			return nil, fmt.Errorf("can't find testcases from stdout: %s, stderr: %s", stdout, stderr)
 		}
 		caseList = append(caseList, testcaseList...)
-		if caseList != nil {
-			return caseList, nil
-		}
-
-		if err != nil {
-			log.Printf("file report json not exist: %v", err)
-			return caseList, err
-		}
-		log.Printf("report json file not exists, Please check log")
-		return caseList, fmt.Errorf("dry run report json file not exist")
+		return caseList, nil
 	}
 	log.Printf("Parse json file %s", reportJson)
 	resultParser, err := ginkgoResult.NewResultParser(reportJson, projPath, path, false)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to parse ginkgo dry run output json file %s", reportJson)
 	}
 	results, err := resultParser.Parse()
 	if err != nil {
-		log.Printf("Pasre json file failed")
-		return caseList, err
+		return nil, errors.Wrapf(err, "failed to parse ginkgo dry run output json file %s", reportJson)
 	}
 	for _, result := range results {
 		name := result.Test.Name
@@ -122,7 +121,7 @@ func ginkgo_v2_load(projPath, path, pkgBin string, ginkgoVersion int) ([]*ginkgo
 	return caseList, nil
 }
 
-func dynamicLoadTestcase(projPath string, selectorPath string) ([]*ginkgoTestcase.TestCase, error) {
+func dynamicLoadTestcase(projPath string, selectorPath string) ([]*ginkgoTestcase.TestCase, []*sdkModel.LoadError) {
 	var caseList []*ginkgoTestcase.TestCase
 	absSelectorPath := filepath.Join(projPath, selectorPath)
 	pkgBin := findBinFile(absSelectorPath)
@@ -131,7 +130,14 @@ func dynamicLoadTestcase(projPath string, selectorPath string) ([]*ginkgoTestcas
 		var err error
 		pkgBin, err = ginkgoBuilder.BuildTestPackage(projPath, selectorPath, false)
 		if err != nil {
-			log.Printf("Build package %s during loading failed, err: %s", selectorPath, err.Error())
+			message := fmt.Sprintf("Build package %s during loading failed, err: %s", selectorPath, err.Error())
+			log.Println(message)
+			return nil, []*sdkModel.LoadError{
+				{
+					Name:    selectorPath,
+					Message: message,
+				},
+			}
 		}
 	}
 	ginkgoVersion := ginkgoUtil.FindGinkgoVersion(absSelectorPath)
@@ -139,14 +145,21 @@ func dynamicLoadTestcase(projPath string, selectorPath string) ([]*ginkgoTestcas
 	var err error
 	var testcaseList []*ginkgoTestcase.TestCase
 	if ginkgoVersion == 2 {
-		testcaseList, err = ginkgo_v2_load(projPath, selectorPath, pkgBin, ginkgoVersion)
+		testcaseList, err = ginkgo_v2_load(projPath, selectorPath, pkgBin)
 	} else {
-		testcaseList, err = ginkgo_v1_load(projPath, pkgBin, ginkgoVersion)
+		testcaseList, err = ginkgo_v1_load(projPath, pkgBin)
 	}
 	if err != nil {
-		log.Printf("load testcase by bin file %s failed, err: %v", pkgBin, err)
-		return nil, err
+		message := fmt.Sprintf("load testcase by bin file %s from %s failed, err: %v", pkgBin, selectorPath, err)
+		log.Println(message)
+		return nil, []*sdkModel.LoadError{
+			{
+				Name:    selectorPath,
+				Message: message,
+			},
+		}
 	}
+	log.Printf("load testcase from %s:", selectorPath)
 	for _, testcase := range testcaseList {
 		log.Println(testcase.GetSelector())
 	}
@@ -201,13 +214,10 @@ func DynamicLoadTestcaseInDir(projPath string, rootPath string) ([]*ginkgoTestca
 	log.Printf("Available package list: %v, root path: %s", packageList, rootPath)
 	for _, packagePath := range packageList {
 		log.Printf("Start dynamic load testcase from: %v", packagePath)
-		caseList, err := dynamicLoadTestcase(projPath, packagePath)
-		if err != nil {
-			log.Printf("dynamic load testcase from %s failed, err: %v", packagePath, err)
-			loadErrors = append(loadErrors, &sdkModel.LoadError{
-				Name:    packagePath,
-				Message: err.Error(),
-			})
+		caseList, loadError := dynamicLoadTestcase(projPath, packagePath)
+		if loadError != nil {
+			log.Printf("dynamic load testcase from %s failed, load errors: %v", packagePath, loadError)
+			loadErrors = append(loadErrors, loadError...)
 			continue
 		}
 		// 如果加载出来的用例实际路径与下发的包路径不一致，则表明该用例为共享用例（用例被其他路径下的用例所引用）
@@ -237,13 +247,9 @@ func DynamicLoadTestcaseInFile(projPath string, filePath string) ([]*ginkgoTestc
 	log.Printf("Start dynamic load testcase in file %s", selectorPath)
 	// 这里处理文件，扫描文件上一层的用例，然后过滤
 	parentDir := filepath.Dir(selectorPath)
-	testcaseList, err := dynamicLoadTestcase(projPath, parentDir)
-	if err != nil {
-		log.Printf("dynamic load testcase in %s failed: %v", selectorPath, err)
-		loadErrors = append(loadErrors, &sdkModel.LoadError{
-			Name:    selectorPath,
-			Message: err.Error(),
-		})
+	testcaseList, loadErrors := dynamicLoadTestcase(projPath, parentDir)
+	if loadErrors != nil {
+		log.Printf("dynamic load testcase in %s failed: %v", selectorPath, loadErrors)
 		return nil, loadErrors
 	}
 	return testcaseList, nil
