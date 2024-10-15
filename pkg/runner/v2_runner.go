@@ -17,6 +17,18 @@ import (
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 )
 
+func parseExtraArgs(extraArgs string) (*cmdpkg.CommandArgs, error) {
+	if strings.HasPrefix(extraArgs, "b64://") {
+		decodedValue, err := base64.StdEncoding.DecodeString(extraArgs[6:])
+		if err != nil {
+			log.Printf("Decode %s failed, err: %s", extraArgs, err.Error())
+		} else {
+			extraArgs = string(decodedValue)
+		}
+	}
+	return cmdpkg.NewCmdArgsParseByCmdLine(extraArgs)
+}
+
 func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNames []string, hasClient bool) string {
 	if hasClient {
 		defaultCmdLine := fmt.Sprintf("ginkgo --v --no-color --trace --json-report %s --output-dir %s --always-emit-ginkgo-writer", jsonFileName, projPath)
@@ -26,15 +38,7 @@ func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNam
 			return ""
 		}
 		if extraArgs != "" {
-			if strings.HasPrefix(extraArgs, "b64://") {
-				decodedValue, err := base64.StdEncoding.DecodeString(extraArgs[6:])
-				if err != nil {
-					log.Printf("Decode %s failed, err: %s", extraArgs, err.Error())
-				} else {
-					extraArgs = string(decodedValue)
-				}
-			}
-			extraCmdArgs, err := cmdpkg.NewCmdArgsParseByCmdLine(extraArgs)
+			extraCmdArgs, err := parseExtraArgs(extraArgs)
 			if err != nil {
 				log.Printf("Parse extra cmd args [%s] error: %v", extraArgs, err)
 			} else {
@@ -50,7 +54,11 @@ func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNam
 		cmdline := cmdArgs.GenerateCmdLineStr()
 		return cmdline
 	} else {
-		return pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report="%s" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus="%s"`, jsonFileName, cmdpkg.GenTestCaseFocusName(tcNames, false))
+		if extraArgs == "" {
+			return pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report="%s" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus="%s"`, jsonFileName, cmdpkg.GenTestCaseFocusName(tcNames, false))
+		} else {
+			return pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report="%s" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus="%s" %s`, jsonFileName, cmdpkg.GenTestCaseFocusName(tcNames, false), extraArgs)
+		}
 	}
 }
 

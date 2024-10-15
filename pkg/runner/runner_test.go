@@ -29,6 +29,14 @@ func TestGenarateCommandLine(t *testing.T) {
 	extraArgs = "b64://LS1wcm9jcyAzIC0tdGltZW91dCA1aCAtLWZvY3VzICJjYXNlIiAtLWxhYmVsLWZpbHRlciAiKCBsYWJlbDAxfHxsYWJlbDAyKSIgLS10aW1lb3V0IDVoIA=="
 	cmdline = genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin, tcNames, true)
 	assert.Equal(t, expected, cmdline, "should return the expected command line")
+	extraArgs = `--ginkgo.label-filter "( label01||label02)"`
+	expected = "suite.test --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report=\"output.json\" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus=\"case01|case02\" --ginkgo.label-filter \"( label01||label02)\""
+	cmdline = genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin, tcNames, false)
+	assert.Equal(t, expected, cmdline, "should return the expected command line")
+	extraArgs = ""
+	expected = "suite.test --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report=\"output.json\" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus=\"case01|case02\""
+	cmdline = genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin, tcNames, false)
+	assert.Equal(t, expected, cmdline, "should return the expected command line")
 }
 
 func Test_obtainExpectedExecuteCases(t *testing.T) {
