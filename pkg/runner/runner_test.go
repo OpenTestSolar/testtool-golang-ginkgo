@@ -53,7 +53,7 @@ func Test_obtainExpectedExecuteCases(t *testing.T) {
 	err = os.Setenv("TESTSOLAR_TTP_EXTRAARGS", "1")
 	assert.NoError(t, err)
 	expectedCases := obtainExpectedExecuteCasesByDryRun(projPath, cmdline)
-	assert.Len(t, expectedCases, 4)
+	assert.Len(t, expectedCases, 5)
 }
 
 func Test_getExpectedCases(t *testing.T) {
@@ -70,7 +70,7 @@ func Test_getExpectedCases(t *testing.T) {
 	err = os.Setenv("TESTSOLAR_TTP_EXTRAARGS", "1")
 	assert.NoError(t, err)
 	expectedCases := getExpectedCases(cmdline, projPath, "tests/ginkgo/demo/demo_test.go", "tests/ginkgo/demo", []string{})
-	assert.Len(t, expectedCases, 4)
+	assert.Len(t, expectedCases, 5)
 }
 
 func Test_convertExpectedCasesToFailedCases(t *testing.T) {

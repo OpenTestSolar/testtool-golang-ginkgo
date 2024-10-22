@@ -7,7 +7,7 @@ import (
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 )
 
-func addLabels(specName string, hierarchyLabels [][]string, nodeLabels []string) string {
+func getLabels(hierarchyLabels [][]string, nodeLabels []string) []string {
 	// filter duplicate labels
 	inLabels := func(labels []string, label string) bool {
 		for _, l := range labels {
@@ -31,6 +31,11 @@ func addLabels(specName string, hierarchyLabels [][]string, nodeLabels []string)
 			labels = append(labels, label)
 		}
 	}
+	return labels
+}
+
+func addLabels(specName string, hierarchyLabels [][]string, nodeLabels []string) string {
+	labels := getLabels(hierarchyLabels, nodeLabels)
 	if len(labels) != 0 {
 		specName += " " + fmt.Sprintf("[%s]", strings.Join(labels, ", "))
 	}
