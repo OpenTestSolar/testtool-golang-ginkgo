@@ -106,12 +106,19 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 		if marshalNameList, err := json.Marshal([]string{containerName, leafName}); err == nil {
 			nameList = string(marshalNameList)
 		}
+		var labelList string
+		if labels := getLabels(spec.ContainerHierarchyLabels, spec.LeafNodeLabels); len(labels) > 0 {
+			if marshalLabelList, err := json.Marshal(labels); err == nil {
+				labelList = string(marshalLabelList)
+			}
+		}
 		steps := spec.GenerateSteps()
 		testResults = append(testResults, &sdkModel.TestResult{
 			Test: &sdkModel.TestCase{
 				Name: spec.outputTestName(p.projPath, p.packPath, specName),
 				Attributes: map[string]string{
 					"nameList": nameList,
+					"label":    labelList,
 				},
 			},
 			StartTime:  spec.StartTime,

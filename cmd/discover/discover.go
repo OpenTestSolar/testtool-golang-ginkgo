@@ -88,7 +88,13 @@ func LoadTestcases(projPath string, targetSelectors []*ginkgoSelector.TestSelect
 		}
 		loadedSelectorPath[testSelector.Path] = struct{}{}
 		loadedTestcases, lErrors := ginkgoLoader.LoadTestCase(projPath, testSelector.Path)
-		testcases = append(testcases, loadedTestcases...)
+		for _, loadedTestcase := range loadedTestcases {
+			if loadedTestcase.MatchAttr(testSelector.Attributes) {
+				testcases = append(testcases, loadedTestcase)
+			} else {
+				log.Printf("[Plugin] testcase %s not match selector attribute %v", loadedTestcase.GetSelector(), testSelector.Attributes)
+			}
+		}
 		loadErrors = append(loadErrors, lErrors...)
 	}
 	return testcases, loadErrors

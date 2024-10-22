@@ -43,3 +43,13 @@ var _ = Describe("Testcase01", func() {
 		})
 	})
 })
+
+var _ = Describe("Testcase02", func() {
+	Describe("test data", func() {
+		Context("test data", Label("label01"), func() {
+			It("test get data successfully", Label("label02"), func() {
+				Expect(0).To(Equal(0))
+			})
+		})
+	})
+})

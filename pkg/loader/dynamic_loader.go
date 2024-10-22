@@ -53,7 +53,7 @@ func ginkgo_v1_load(projPath, pkgBin string) ([]*ginkgoTestcase.TestCase, error)
 	testcaseList, err := ginkgoResult.ParseCaseByReg(projPath, stdout, 1, "")
 	if err != nil {
 		message := fmt.Sprintf("find testcase from stdout failed, err: %v, stdout: %s, stderr: %s", err, stdout, stderr)
-		log.Printf(message)
+		log.Print(message)
 		return nil, errors.New(message)
 	}
 	if len(testcaseList) == 0 {
