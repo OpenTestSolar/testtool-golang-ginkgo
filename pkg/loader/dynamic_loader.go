@@ -50,6 +50,11 @@ func ginkgo_v1_load(projPath, pkgBin string) ([]*ginkgoTestcase.TestCase, error)
 		log.Println(message)
 		return nil, errors.New(message)
 	}
+	// 如果加载出来测试套中的用例数为空则直接返回
+	if strings.Contains(stdout, "Ran 0 of 0 Specs in 0.000 seconds") {
+		log.Printf("no testcases found in %s", pkgBin)
+		return []*ginkgoTestcase.TestCase{}, nil
+	}
 	testcaseList, err := ginkgoResult.ParseCaseByReg(projPath, stdout, 1, "")
 	if err != nil {
 		message := fmt.Sprintf("find testcase from stdout failed, err: %v, stdout: %s, stderr: %s", err, stdout, stderr)
