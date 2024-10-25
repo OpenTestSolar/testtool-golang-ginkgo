@@ -30,18 +30,26 @@ func TestLoadTestCase(t *testing.T) {
 	assert.NoError(t, err)
 	absPath, err = filepath.Abs("../../testdata/")
 	assert.NoError(t, err)
-	// test dynamic loading testcase in directory
 	err = builder.Build(absPath)
 	assert.NoError(t, err)
 	defer os.Remove("../../testdata/demo.test")
 	defer os.Remove("../../testdata/demo/book.test")
 	defer os.Remove("../../testdata/demo/report.json")
+	// test dynamic loading testcase in directory
 	testcases, loadErrors = LoadTestCase(absPath, "demo")
 	assert.NotEqual(t, len(testcases), 0)
 	assert.Len(t, loadErrors, 0)
 	// test dynamic loading testcase in file
 	testcases, loadErrors = LoadTestCase(absPath, "demo/demo_test.go")
 	assert.NotEqual(t, len(testcases), 0)
+	assert.Len(t, loadErrors, 0)
+	// test dynamic loading v1 testcase in directory
+	testcases, loadErrors = LoadTestCase(absPath, "demo/v1")
+	assert.NotEqual(t, len(testcases), 0)
+	assert.Len(t, loadErrors, 0)
+	// test dynamic loading empty v1 testcase in directory
+	testcases, loadErrors = LoadTestCase(absPath, "demo/v1_empty")
+	assert.Len(t, testcases, 0)
 	assert.Len(t, loadErrors, 0)
 	// test dynamic loading testcase in directory without test binary
 	os.Remove("../../testdata/demo.test")

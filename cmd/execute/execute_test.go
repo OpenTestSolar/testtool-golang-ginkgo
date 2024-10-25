@@ -156,7 +156,7 @@ func Test_discoverExecutableTestcases(t *testing.T) {
 	}
 	execTestcases, err := discoverExecutableTestcases(testcases)
 	assert.NoError(t, err)
-	assert.Len(t, execTestcases, 2)
+	assert.Len(t, execTestcases, 4)
 	// 验证如果传入的是文件路径则直接返回
 	testcases = []*testcase.TestCase{
 		{
