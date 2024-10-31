@@ -37,7 +37,7 @@ func TestParseJsonToObj(t *testing.T) {
 	results, err = parser.Parse()
 	assert.NoError(t, err)
 	assert.Len(t, results, 1)
-	if results[0].Test.Name != "suites/demo/demo_suite_test.go?HierarchyText01 HierarchyText02  /Text [label01, label02, label11, node-label01]" {
+	if results[0].Test.Name != "suites/demo/demo_suite_test.go?HierarchyText01 HierarchyText02   Text [label01, label02, label11, node-label01]" {
 		t.Errorf("incorrect case name: %s", results[0].Test.Name)
 	}
 

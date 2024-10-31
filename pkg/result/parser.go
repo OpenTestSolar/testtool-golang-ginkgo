@@ -101,7 +101,7 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 		if containerName == "" && leafName == "" {
 			continue
 		}
-		specName := strings.Join([]string{containerName, leafName}, "/")
+		specName := strings.Join([]string{containerName, leafName}, " ")
 		var nameList string
 		if marshalNameList, err := json.Marshal([]string{containerName, leafName}); err == nil {
 			nameList = string(marshalNameList)
