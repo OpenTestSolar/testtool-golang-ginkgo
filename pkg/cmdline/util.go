@@ -27,6 +27,7 @@ func GenTestCaseFocusName(tcNames []string, ginkgoV1 bool) string {
 	// ginkgo中focus参数需要输入一个正则表达式，因此需要将用例名中和正则表达式相关的字符进行转义
 	var escapedNames []string
 	for _, name := range tcNames {
+		// TODO: 移除该逻辑
 		if !ginkgoV1 {
 			name = strings.Replace(name, "/", " ", -1)
 		}
