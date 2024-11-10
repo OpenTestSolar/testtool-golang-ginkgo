@@ -3,7 +3,7 @@ name: ginkgo
 nameZh: Ginkgo自动化测试工具
 lang: golang
 langType: COMPILED
-version: '0.2.32'
+version: '0.2.33'
 description: Ginkgo自动化测试工具
 defaultBaseImage: golang:1.22
 scaffoldRepo: https://github.com/OpenTestSolar/testtool-scaffold-ginkgo
