@@ -204,6 +204,26 @@ func getAvailableSuitePath(projPath, rootPath string) ([]string, error) {
 	return packageList, nil
 }
 
+func getSuiteFileNameInPackage(p string) (string, error) {
+	f, err := os.Open(p)
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to open %s", p)
+	}
+	defer f.Close()
+
+	files, err := f.Readdir(-1)
+	if err != nil {
+		errors.Wrapf(err, "failed to read %s", p)
+	}
+
+	for _, file := range files {
+		if strings.HasSuffix(file.Name(), "_suite_test.go") {
+			return file.Name(), nil
+		}
+	}
+	return "", errors.New("Can't find suite test file")
+}
+
 func DynamicLoadTestcaseInDir(projPath string, rootPath string) ([]*ginkgoTestcase.TestCase, []*sdkModel.LoadError) {
 	var testcaseList []*ginkgoTestcase.TestCase
 	var loadErrors []*sdkModel.LoadError
@@ -229,8 +249,16 @@ func DynamicLoadTestcaseInDir(projPath string, rootPath string) ([]*ginkgoTestca
 		// 这种情况下为避免sdk由于selector中下发的路径与实际加载出来的用例路径不匹配而将用例过滤，需要将用例的路径更改为包路径
 		for _, c := range caseList {
 			if c.Path != packagePath && !strings.HasPrefix(c.Path, packagePath) {
-				log.Printf("Loaded case [path: %s, name: %s] has different path with package: %s, replace case's path to package path", c.Path, c.Name, packagePath)
-				c.Path = packagePath
+				suiteFileName, err := getSuiteFileNameInPackage(packagePath)
+				if err != nil {
+					log.Printf("get suite file name in package %s failed, err: %v", packagePath, err)
+					log.Printf("Loaded case [path: %s, name: %s] has different path with package: %s, replace case's path to package path", c.Path, c.Name, packagePath)
+					c.Path = packagePath
+				} else {
+					suitePath := filepath.Join(packagePath, suiteFileName)
+					log.Printf("Loaded case [path: %s, name: %s] has different path with package: %s, replace case's path to suite path %s", c.Path, c.Name, packagePath, suitePath)
+					c.Path = suitePath
+				}
 			}
 		}
 		testcaseList = append(testcaseList, caseList...)
