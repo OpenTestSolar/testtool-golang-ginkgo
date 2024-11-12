@@ -261,6 +261,13 @@ func DynamicLoadTestcaseInFile(projPath string, filePath string) ([]*ginkgoTestc
 	// 这里处理文件，扫描文件上一层的用例，然后过滤
 	parentDir := filepath.Dir(selectorPath)
 	testcaseList, loadErrors := dynamicLoadTestcase(projPath, parentDir)
+	for _, c := range testcaseList {
+		// 如果加载出来的用例路径不在当前包下，则表明该用例为一个引用用例
+		// 低版本ginkgo对于引用用例无法正确解析用例的引用路径，因此需要将用例路径设置为当前下发的加载文件路径
+		if !strings.HasPrefix(c.Path, parentDir) {
+			c.Path = selectorPath
+		}
+	}
 	if loadErrors != nil {
 		log.Printf("dynamic load testcase in %s failed: %v", selectorPath, loadErrors)
 		return nil, loadErrors

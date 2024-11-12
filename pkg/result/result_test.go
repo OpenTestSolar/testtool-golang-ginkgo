@@ -15,7 +15,7 @@ func TestParseJsonToObj(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, results, 2)
 	for _, result := range results {
-		if !strings.HasPrefix(result.Test.Name, "suits/demo") {
+		if !strings.HasPrefix(result.Test.Name, "test/test_test.go") {
 			t.Errorf("incorrect case name: %s", result.Test.Name)
 		}
 	}
