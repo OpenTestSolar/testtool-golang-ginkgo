@@ -204,26 +204,6 @@ func getAvailableSuitePath(projPath, rootPath string) ([]string, error) {
 	return packageList, nil
 }
 
-func getSuiteFileNameInPackage(p string) (string, error) {
-	f, err := os.Open(p)
-	if err != nil {
-		return "", errors.Wrapf(err, "failed to open %s", p)
-	}
-	defer f.Close()
-
-	files, err := f.Readdir(-1)
-	if err != nil {
-		errors.Wrapf(err, "failed to read %s", p)
-	}
-
-	for _, file := range files {
-		if strings.HasSuffix(file.Name(), "_suite_test.go") {
-			return file.Name(), nil
-		}
-	}
-	return "", errors.New("Can't find suite test file")
-}
-
 func DynamicLoadTestcaseInDir(projPath string, rootPath string) ([]*ginkgoTestcase.TestCase, []*sdkModel.LoadError) {
 	var testcaseList []*ginkgoTestcase.TestCase
 	var loadErrors []*sdkModel.LoadError
@@ -246,10 +226,10 @@ func DynamicLoadTestcaseInDir(projPath string, rootPath string) ([]*ginkgoTestca
 			continue
 		}
 		// 如果加载出来的用例实际路径与下发的包路径不一致，则表明该用例为共享用例（用例被其他路径下的用例所引用）
-		// 这种情况下为避免sdk由于selector中下发的路径与实际加载出来的用例路径不匹配而将用例过滤，需要将用例的路径更改为包路径
+		// 这种情况下无法确定用例具体对应的文件路径，因此需要将用例文件路径修改为包下的_suite_test.go文件
 		for _, c := range caseList {
 			if c.Path != packagePath && !strings.HasPrefix(c.Path, packagePath) {
-				suiteFileName, err := getSuiteFileNameInPackage(packagePath)
+				suiteFileName, err := ginkgoUtil.GetSuiteFileNameInPackage(packagePath)
 				if err != nil {
 					log.Printf("get suite file name in package %s failed, err: %v", packagePath, err)
 					log.Printf("Loaded case [path: %s, name: %s] has different path with package: %s, replace case's path to package path", c.Path, c.Name, packagePath)

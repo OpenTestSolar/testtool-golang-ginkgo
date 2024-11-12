@@ -23,7 +23,7 @@ func newTestStepInfo(rawStr string) (*TestStepInfo, error) {
 	return &stepInfo, nil
 }
 
-type LeafNodeLocation struct {
+type NodeLocation struct {
 	FileName string
 }
 
@@ -65,21 +65,22 @@ func (f *Failure) getMessage() string {
 }
 
 type Spec struct {
-	ContainerHierarchyTexts    []string
-	LeafNodeType               string
-	LeafNodeText               string
-	ContainerHierarchyLabels   [][]string
-	LeafNodeLabels             []string
-	StartTime                  time.Time
-	EndTime                    time.Time
-	LeafNodeLocation           *LeafNodeLocation
-	RunTime                    time.Duration
-	State                      string
-	CapturedStdOutErr          string
-	CapturedGinkgoWriterOutput string
-	ReportEntries              []*ReportEntry
-	Failure                    *Failure
-	ParallelProcess            int64
+	ContainerHierarchyTexts     []string
+	ContainerHierarchyLocations []*NodeLocation
+	LeafNodeType                string
+	LeafNodeText                string
+	ContainerHierarchyLabels    [][]string
+	LeafNodeLabels              []string
+	StartTime                   time.Time
+	EndTime                     time.Time
+	LeafNodeLocation            *NodeLocation
+	RunTime                     time.Duration
+	State                       string
+	CapturedStdOutErr           string
+	CapturedGinkgoWriterOutput  string
+	ReportEntries               []*ReportEntry
+	Failure                     *Failure
+	ParallelProcess             int64
 }
 
 func (s *Spec) getContainerAndLeafName() (string, string) {
@@ -221,9 +222,14 @@ func (s *Spec) generateFailureStep() *sdkModel.TestCaseStep {
 func (s *Spec) outputTestName(projectPath, packPath, specName string) string {
 	casePath := removeProjectPrefix(s.LeafNodeLocation.FileName, projectPath)
 	packPath = removeProjectPrefix(packPath, projectPath)
-	// 如果解析的用例路径与当前执行用例的包路径不一致，则表明该用例为共享用例，需要在上报结果时将路径替换为包路径
+	// 如果解析的用例路径与当前执行用例的包路径不一致，则表明该用例为共享用例，需要在上报结果时将路径替换为第一个节点所在路径(即引用共享用例的用例所在文件路径)
 	if !strings.HasPrefix(casePath, packPath) {
-		return packPath + "?" + specName
+		if s.ContainerHierarchyLocations != nil {
+			filePath := removeProjectPrefix(s.ContainerHierarchyLocations[0].FileName, projectPath)
+			return filePath + "?" + specName
+		} else {
+			return packPath + "?" + specName
+		}
 	} else {
 		return casePath + "?" + specName
 	}

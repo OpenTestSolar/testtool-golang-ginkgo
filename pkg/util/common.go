@@ -2,8 +2,8 @@ package util
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -177,4 +177,24 @@ func checkGinkgoImportVersion(file string) int {
 	})
 
 	return version
+}
+
+func GetSuiteFileNameInPackage(p string) (string, error) {
+	f, err := os.Open(p)
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to open %s", p)
+	}
+	defer f.Close()
+
+	files, err := f.Readdir(-1)
+	if err != nil {
+		errors.Wrapf(err, "failed to read %s", p)
+	}
+
+	for _, file := range files {
+		if strings.HasSuffix(file.Name(), "_suite_test.go") {
+			return file.Name(), nil
+		}
+	}
+	return "", errors.New("Can't find suite test file")
 }
