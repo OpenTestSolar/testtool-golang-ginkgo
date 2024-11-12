@@ -213,7 +213,7 @@ func RunGinkgoV2Test(projPath, pkgBin, filepath string, tcNames []string) ([]*sd
 		return generateFailedCasesWhenSuitePanic(stdout, stderr, nil, expectedCases), nil
 	}
 	log.Printf("Parse json file %s", outputJsonFile)
-	resultParser, err := ginkgoResult.NewResultParser(outputJsonFile, projPath, packPath, true)
+	resultParser, err := ginkgoResult.NewResultParser(outputJsonFile, projPath, packPath, filepath, true)
 	if err != nil {
 		log.Printf("instantiate result parser failed, err: %s", err.Error())
 		return nil, err

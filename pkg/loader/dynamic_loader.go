@@ -101,7 +101,7 @@ func ginkgo_v2_load(projPath, path, pkgBin string) ([]*ginkgoTestcase.TestCase, 
 		return caseList, nil
 	}
 	log.Printf("Parse json file %s", reportJson)
-	resultParser, err := ginkgoResult.NewResultParser(reportJson, projPath, path, false)
+	resultParser, err := ginkgoResult.NewResultParser(reportJson, projPath, path, "", false)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to parse ginkgo dry run output json file %s", reportJson)
 	}
