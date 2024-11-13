@@ -28,8 +28,7 @@ func GenTestCaseFocusName(tcNames []string) string {
 	var escapedNames []string
 	for _, name := range tcNames {
 		// 将双引号转义
-		name = strings.Replace(name, "\"", "\\\"", -1)
-		escapedNames = append(escapedNames, regexp.QuoteMeta(name))
+		escapedNames = append(escapedNames, strings.Replace(regexp.QuoteMeta(name), "\"", "\\\"", -1))
 	}
 	name := strings.Join(escapedNames, "|")
 	return name
