@@ -188,7 +188,7 @@ func GetSuiteFileNameInPackage(p string) (string, error) {
 
 	files, err := f.Readdir(-1)
 	if err != nil {
-		errors.Wrapf(err, "failed to read %s", p)
+		return "", errors.Wrapf(err, "failed to read %s", p)
 	}
 
 	for _, file := range files {
