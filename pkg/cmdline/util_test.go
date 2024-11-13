@@ -12,7 +12,7 @@ func TestRemoveTestCaseLabels(t *testing.T) {
 }
 
 func TestGenTestCaseFocusName(t *testing.T) {
-	focusName := GenTestCaseFocusName([]string{"[(case01)]", "case02"}, false)
+	focusName := GenTestCaseFocusName([]string{"[(case01)]", "case02"})
 	assert.Equal(t, focusName, "\\[\\(case01\\)\\]|case02")
 }
 

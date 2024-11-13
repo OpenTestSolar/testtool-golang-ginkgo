@@ -48,16 +48,16 @@ func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNam
 		// 通过环境变量控制是否需要以`--focus`的形式下发用例执行
 		// 部分场景下ginkgo用例名中存在特殊字符，拼接到命令行中会导致报错，因此需要避免使用focus参数
 		if cmdArgs.NeedFocus() {
-			cmdArgs.AddIfNotExists([]*cmdpkg.CommandArg{{Key: "--focus", Value: fmt.Sprintf("\"%s\"", cmdpkg.GenTestCaseFocusName(tcNames, false))}})
+			cmdArgs.AddIfNotExists([]*cmdpkg.CommandArg{{Key: "--focus", Value: fmt.Sprintf("\"%s\"", cmdpkg.GenTestCaseFocusName(tcNames))}})
 		}
 		cmdArgs.Add(&cmdpkg.CommandArg{Key: "", Value: pkgBin})
 		cmdline := cmdArgs.GenerateCmdLineStr()
 		return cmdline
 	} else {
 		if extraArgs == "" {
-			return pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report="%s" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus="%s"`, jsonFileName, cmdpkg.GenTestCaseFocusName(tcNames, false))
+			return pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report="%s" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus="%s"`, jsonFileName, cmdpkg.GenTestCaseFocusName(tcNames))
 		} else {
-			return pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report="%s" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus="%s" %s`, jsonFileName, cmdpkg.GenTestCaseFocusName(tcNames, false), extraArgs)
+			return pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report="%s" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus="%s" %s`, jsonFileName, cmdpkg.GenTestCaseFocusName(tcNames), extraArgs)
 		}
 	}
 }
