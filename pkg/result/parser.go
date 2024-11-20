@@ -116,7 +116,8 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 		}
 		steps := spec.GenerateSteps()
 		var name string
-		if p.filePath != "" {
+		// 如果已经传入文件路径则直接使用文件路径作为上报用例结果的路径
+		if p.filePath != "" && strings.HasSuffix(p.filePath, ".go") {
 			name = p.filePath + "?" + specName
 		} else {
 			name = spec.outputTestName(p.projPath, p.packPath, specName)
