@@ -81,13 +81,7 @@ func ParseCaseByReg(proj string, output string, ginkgoVersion int, packPath stri
 				selectorPath = strings.Split(strings.TrimSpace(path), proj)[1]
 				selectorPath = selectorPath[1:]
 			}
-			// TODO: 后续需要将分割符统一切换为空格
-			var name string
-			if ginkgoVersion == 1 {
-				name = strings.Join(nameList, " ")
-			} else {
-				name = strings.Join(nameList, "/")
-			}
+			name := strings.Join(nameList, " ")
 			caseInfo := &ginkgoTestcase.TestCase{
 				Path:       selectorPath,
 				Name:       name,

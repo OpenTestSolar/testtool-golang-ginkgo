@@ -18,7 +18,7 @@ func RunGinkgoV1Test(projPath string, pkgBin string, filepath string, tcNames []
 	var testResults []*sdkModel.TestResult
 	_, filename := path.Split(pkgBin)
 	outputXmlFile := path.Join(projPath, fmt.Sprintf("%s_output.xml", filename))
-	cmdline := pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.noColor --ginkgo.trace --ginkgo.reportFile="%s" --ginkgo.focus="%s" `, outputXmlFile, cmdpkg.GenTestCaseFocusName(tcNames, true))
+	cmdline := pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.noColor --ginkgo.trace --ginkgo.reportFile="%s" --ginkgo.focus="%s" `, outputXmlFile, cmdpkg.GenTestCaseFocusName(tcNames))
 	log.Printf("Run cmdline %s", cmdline)
 	startTime := time.Now()
 	workDir := strings.TrimSuffix(pkgBin, ".test")

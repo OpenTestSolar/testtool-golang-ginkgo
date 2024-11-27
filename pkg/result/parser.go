@@ -19,10 +19,11 @@ type ResultParser struct {
 	projPath string
 	packPath string
 	run      bool
+	filePath string
 }
 
-func NewResultParser(filePath string, projectPath string, packPath string, run bool) (*ResultParser, error) {
-	byteValue, err := os.ReadFile(filePath)
+func NewResultParser(jsonFile string, projectPath string, packPath string, filePath string, run bool) (*ResultParser, error) {
+	byteValue, err := os.ReadFile(jsonFile)
 	if err != nil {
 		return nil, fmt.Errorf("read result file failed, err: %s", err.Error())
 	}
@@ -37,6 +38,7 @@ func NewResultParser(filePath string, projectPath string, packPath string, run b
 		projPath: projectPath,
 		packPath: packPath,
 		run:      run,
+		filePath: filePath,
 	}, nil
 }
 
@@ -101,7 +103,7 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 		if containerName == "" && leafName == "" {
 			continue
 		}
-		specName := strings.Join([]string{containerName, leafName}, "/")
+		specName := strings.Join([]string{containerName, leafName}, " ")
 		var nameList string
 		if marshalNameList, err := json.Marshal([]string{containerName, leafName}); err == nil {
 			nameList = string(marshalNameList)
@@ -113,9 +115,16 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 			}
 		}
 		steps := spec.GenerateSteps()
+		var name string
+		// 如果已经传入文件路径则直接使用文件路径作为上报用例结果的路径
+		if p.filePath != "" && strings.HasSuffix(p.filePath, ".go") {
+			name = p.filePath + "?" + specName
+		} else {
+			name = spec.outputTestName(p.projPath, p.packPath, specName)
+		}
 		testResults = append(testResults, &sdkModel.TestResult{
 			Test: &sdkModel.TestCase{
-				Name: spec.outputTestName(p.projPath, p.packPath, specName),
+				Name: name,
 				Attributes: map[string]string{
 					"nameList": nameList,
 					"label":    labelList,

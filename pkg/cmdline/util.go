@@ -21,16 +21,14 @@ func removeTestCaseLabels(tcNames []string) []string {
 	return replacedNames
 }
 
-func GenTestCaseFocusName(tcNames []string, ginkgoV1 bool) string {
+func GenTestCaseFocusName(tcNames []string) string {
 	// 传入的用例名中可能包含用例标签，ginkgo focus参数中只能识别用例名，因此需要去除
 	tcNames = removeTestCaseLabels(tcNames)
 	// ginkgo中focus参数需要输入一个正则表达式，因此需要将用例名中和正则表达式相关的字符进行转义
 	var escapedNames []string
 	for _, name := range tcNames {
-		if !ginkgoV1 {
-			name = strings.Replace(name, "/", " ", -1)
-		}
-		escapedNames = append(escapedNames, regexp.QuoteMeta(name))
+		// 将双引号转义
+		escapedNames = append(escapedNames, strings.Replace(regexp.QuoteMeta(name), "\"", "\\\"", -1))
 	}
 	name := strings.Join(escapedNames, "|")
 	return name

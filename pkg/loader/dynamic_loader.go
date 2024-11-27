@@ -101,7 +101,7 @@ func ginkgo_v2_load(projPath, path, pkgBin string) ([]*ginkgoTestcase.TestCase, 
 		return caseList, nil
 	}
 	log.Printf("Parse json file %s", reportJson)
-	resultParser, err := ginkgoResult.NewResultParser(reportJson, projPath, path, false)
+	resultParser, err := ginkgoResult.NewResultParser(reportJson, projPath, path, "", false)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to parse ginkgo dry run output json file %s", reportJson)
 	}
@@ -226,11 +226,19 @@ func DynamicLoadTestcaseInDir(projPath string, rootPath string) ([]*ginkgoTestca
 			continue
 		}
 		// 如果加载出来的用例实际路径与下发的包路径不一致，则表明该用例为共享用例（用例被其他路径下的用例所引用）
-		// 这种情况下为避免sdk由于selector中下发的路径与实际加载出来的用例路径不匹配而将用例过滤，需要将用例的路径更改为包路径
+		// 这种情况下无法确定用例具体对应的文件路径，因此需要将用例文件路径修改为包下的_suite_test.go文件
 		for _, c := range caseList {
 			if c.Path != packagePath && !strings.HasPrefix(c.Path, packagePath) {
-				log.Printf("Loaded case [path: %s, name: %s] has different path with package: %s, replace case's path to package path", c.Path, c.Name, packagePath)
-				c.Path = packagePath
+				suiteFileName, err := ginkgoUtil.GetSuiteFileNameInPackage(packagePath)
+				if err != nil {
+					log.Printf("get suite file name in package %s failed, err: %v", packagePath, err)
+					log.Printf("Loaded case [path: %s, name: %s] has different path with package: %s, replace case's path to package path", c.Path, c.Name, packagePath)
+					c.Path = packagePath
+				} else {
+					suitePath := filepath.Join(packagePath, suiteFileName)
+					log.Printf("Loaded case [path: %s, name: %s] has different path with package: %s, replace case's path to suite path %s", c.Path, c.Name, packagePath, suitePath)
+					c.Path = suitePath
+				}
 			}
 		}
 		testcaseList = append(testcaseList, caseList...)
@@ -253,6 +261,13 @@ func DynamicLoadTestcaseInFile(projPath string, filePath string) ([]*ginkgoTestc
 	// 这里处理文件，扫描文件上一层的用例，然后过滤
 	parentDir := filepath.Dir(selectorPath)
 	testcaseList, loadErrors := dynamicLoadTestcase(projPath, parentDir)
+	for _, c := range testcaseList {
+		// 如果加载出来的用例路径不在当前包下，则表明该用例为一个引用用例
+		// 低版本ginkgo对于引用用例无法正确解析用例的引用路径，因此需要将用例路径设置为当前下发的加载文件路径
+		if !strings.HasPrefix(c.Path, parentDir) {
+			c.Path = selectorPath
+		}
+	}
 	if loadErrors != nil {
 		log.Printf("dynamic load testcase in %s failed: %v", selectorPath, loadErrors)
 		return nil, loadErrors
