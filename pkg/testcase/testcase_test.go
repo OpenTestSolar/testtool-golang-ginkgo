@@ -71,6 +71,11 @@ func TestParseTestCaseBySelector(t *testing.T) {
 	assert.Equal(t, testCase4.Path, "path/to/test")
 	assert.Equal(t, testCase4.Name, "test Name")
 	assert.Equal(t, testCase4.Attributes["attr1"], "value=1")
+	// 测试用例5：包含特殊字符的selector
+	testCase5, err := ParseTestCaseBySelector("path/to/test?[+]")
+	assert.NoError(t, err)
+	assert.Equal(t, testCase5.Path, "path/to/test")
+	assert.Equal(t, testCase5.Name, "[+]")
 }
 
 func TestGetSelector(t *testing.T) {
