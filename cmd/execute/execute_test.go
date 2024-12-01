@@ -206,9 +206,17 @@ func Test_findCompileBinary(t *testing.T) {
 	binFile := filepath.Join(projPath, "demo01.test")
 	_, err = os.Create(binFile)
 	assert.NoError(t, err)
-	defer os.Remove(binFile)
 	result = findCompileBinary(filepath.Join(projPath, "demo01"))
 	assert.Equal(t, binFile, result)
 	result = findCompileBinary(filepath.Join(projPath, "demo01", "test"))
 	assert.Equal(t, binFile, result)
+	// 测试存在不与目录同名的二进制文件时
+	err = os.Remove(binFile)
+	assert.NoError(t, err)
+	otherBinFile := filepath.Join(projPath, "demo01_xxx.test")
+	_, err = os.Create(otherBinFile)
+	assert.NoError(t, err)
+	result = findCompileBinary(filepath.Join(projPath, "demo01"))
+	assert.NotEqual(t, binFile, result)
+	defer os.Remove(binFile)
 }
