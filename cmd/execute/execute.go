@@ -102,6 +102,23 @@ func findTestPackagesByPath(path string) ([]string, error) {
 	return subDirs, nil
 }
 
+func findTestBinaryInDir(dir string) (string, error) {
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		log.Printf("failed to read dir: %s, err: %v", dir, err)
+		return "", err
+	}
+	for _, file := range files {
+		if !file.IsDir() {
+			if strings.HasSuffix(file.Name(), ".test") {
+				log.Printf("[PLUGIN]find test binary file %s in dir %s", file.Name(), dir)
+				return filepath.Join(dir, file.Name()), nil
+			}
+		}
+	}
+	return "", nil
+}
+
 // findCompileBinary 通过用例路径查询对应二进制可执行文件
 // 通常情况下预编译生成的二进制文件与用例文件所在目录同级
 // 但是部分场景下二进制文件可能处于更上层目录，需要递归查询
@@ -109,6 +126,9 @@ func findCompileBinary(path string) string {
 	for {
 		preCompileFile := path + ".test"
 		if _, err := os.Stat(preCompileFile); err != nil {
+			if binaryFile, err := findTestBinaryInDir(path); err == nil && binaryFile != "" {
+				return binaryFile
+			}
 			path = filepath.Dir(path)
 			if path == "." || path == "/" || path == "\\" {
 				break
