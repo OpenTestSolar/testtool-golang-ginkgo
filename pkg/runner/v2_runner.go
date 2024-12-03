@@ -65,6 +65,7 @@ func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNam
 // RegenerateDryRunCmd 根据输入的ginkgo执行命令重新生成对应的dry run命令
 // 输入参数如下：
 // - cmd: 需要处理的原始命令行参数字符串
+// - tcNames: 下发的用例列表
 // 返回值：
 //   - newCmd: 生成的新命令字符合成后的字符串表示形式
 //     注意：当传入不合法或者不符合要求的命令时将会抛出错误
@@ -72,8 +73,8 @@ func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNam
 // 示例
 // - 输入: cmd = "ginkgo --v --no-color --procs 10 --always-emit-ginkgo-writer -p /path/to/your/file.test"
 // - 输出: newCmd = "ginkgo --dry-run --v --no-color /path/to/your/file.test"
-func regenerateDryRunCmd(cmd string) (string, error) {
-	dryRunCmdExcludedKeys := []string{"ginkgo", "--procs", "--always-emit-ginkgo-writer"}
+func regenerateDryRunCmd(cmd string, tcNames []string) (string, error) {
+	dryRunCmdExcludedKeys := []string{"ginkgo", "--procs", "--always-emit-ginkgo-writer", "--focus"}
 
 	originalCmdArgs, err := cmdpkg.NewCmdArgsParseByCmdLine(cmd)
 	if err != nil {
@@ -88,6 +89,9 @@ func regenerateDryRunCmd(cmd string) (string, error) {
 		Key:   "--dry-run",
 		Value: "",
 	})
+	if originalCmdArgs.NeedFocus() && len(tcNames) > 0 {
+		dryRunCmdArgs.AddIfNotExists([]*cmdpkg.CommandArg{{Key: "--focus", Value: fmt.Sprintf("\"%s\"", cmdpkg.GenTestCaseFocusName(tcNames))}})
+	}
 	for _, arg := range originalCmdArgs.Args {
 		if !ginkgoUtil.ElementIsInSlice(arg.Key, dryRunCmdExcludedKeys) {
 			dryRunCmdArgs.Add(arg)
@@ -100,9 +104,9 @@ func regenerateDryRunCmd(cmd string) (string, error) {
 // obtainExpectedExecuteCasesByDryRun 根据给定的项目路径和命令行字符串，获取预期执行的测试用例列表。
 // 参数 projPath 是项目的路径。
 // 参数 cmdline 是命令行字符串。
-func obtainExpectedExecuteCasesByDryRun(projPath, cmdline string) []*ginkgoTestcase.TestCase {
+func obtainExpectedExecuteCasesByDryRun(projPath, cmdline string, tcNames []string) []*ginkgoTestcase.TestCase {
 	log.Printf("regenerate dry run cmd by run cmd: [%s]", cmdline)
-	dryRunCmd, err := regenerateDryRunCmd(cmdline)
+	dryRunCmd, err := regenerateDryRunCmd(cmdline, tcNames)
 	if err != nil {
 		log.Printf("regenerate dry run cmd by run cmd [%s] failed, err: %s", cmdline, err.Error())
 		return nil
@@ -175,7 +179,7 @@ func getExpectedCases(cmdline, projPath, filepath, packPath string, tcNames []st
 	var expectedCases []*ginkgoTestcase.TestCase
 	var finalCases []string
 	if os.Getenv("TESTSOLAR_TTP_EXTRAARGS") != "" {
-		expectedCases = obtainExpectedExecuteCasesByDryRun(projPath, cmdline)
+		expectedCases = obtainExpectedExecuteCasesByDryRun(projPath, cmdline, tcNames)
 	}
 	if len(expectedCases) == 0 {
 		for _, name := range tcNames {
