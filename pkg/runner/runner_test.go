@@ -52,7 +52,7 @@ func Test_obtainExpectedExecuteCases(t *testing.T) {
 	cmdline := fmt.Sprintf("ginkgo --v --no-color --procs 10 --always-emit-ginkgo-writer %s", pkgBin)
 	err = os.Setenv("TESTSOLAR_TTP_EXTRAARGS", "1")
 	assert.NoError(t, err)
-	expectedCases := obtainExpectedExecuteCasesByDryRun(projPath, cmdline)
+	expectedCases := obtainExpectedExecuteCasesByDryRun(projPath, cmdline, []string{})
 	assert.Len(t, expectedCases, 5)
 }
 
@@ -92,7 +92,10 @@ func Test_convertExpectedCasesToFailedCases(t *testing.T) {
 }
 
 func Test_regenerateDryRunCmd(t *testing.T) {
-	dryRunCmd, err := regenerateDryRunCmd(`ginkgo --v --no-color --trace --json-report output.json --output-dir /data/workspace --always-emit-ginkgo-writer --procs "10" --timeout "5h" --label-filter "(label01)" /data/workspace.test`)
+	dryRunCmd, err := regenerateDryRunCmd(`ginkgo --v --no-color --trace --json-report output.json --output-dir /data/workspace --always-emit-ginkgo-writer --procs "10" --timeout "5h" --label-filter "(label01)" /data/workspace.test`, []string{})
 	assert.NoError(t, err)
 	assert.Equal(t, dryRunCmd, `ginkgo --dry-run --v --no-color --trace --json-report "output.json" --output-dir "/data/workspace" --timeout "5h" --label-filter "(label01)" /data/workspace.test`)
+	dryRunCmd, err = regenerateDryRunCmd(`ginkgo --v --no-color --trace --json-report output.json --output-dir /data/workspace --always-emit-ginkgo-writer --procs "10" --timeout "5h" --label-filter "(label01)" --focus "\[cls\] 环境变量 采集volume|\[cls\] 环境变量 采集容器路径且包含中文日志" /data/workspace.test`, []string{"[cls] 环境变量 采集volume", "[cls] 环境变量 采集容器路径且包含中文日志"})
+	assert.NoError(t, err)
+	assert.Equal(t, dryRunCmd, `ginkgo --dry-run --focus "\[cls\] 环境变量 采集volume|\[cls\] 环境变量 采集容器路径且包含中文日志" --v --no-color --trace --json-report "output.json" --output-dir "/data/workspace" --timeout "5h" --label-filter "(label01)" /data/workspace.test`)
 }
