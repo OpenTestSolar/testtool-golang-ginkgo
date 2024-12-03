@@ -89,7 +89,14 @@ func (s *Spec) getContainerAndLeafName() (string, string) {
 	if s.ContainerHierarchyTexts == nil {
 		containerName = s.LeafNodeType
 	} else {
-		containerName = strings.Join(s.ContainerHierarchyTexts, " ")
+		// 过滤掉空的容器节点名称
+		var filteredContainerTests []string
+		for _, cn := range s.ContainerHierarchyTexts {
+			if cn != "" {
+				filteredContainerTests = append(filteredContainerTests, cn)
+			}
+		}
+		containerName = strings.Join(filteredContainerTests, " ")
 		// TODO: 确定具体分割符标识
 		leafName = addLabels(s.LeafNodeText, s.ContainerHierarchyLabels, s.LeafNodeLabels)
 	}

@@ -77,6 +77,7 @@ func (tc *TestCase) MatchAttr(attr map[string]string) bool {
 }
 
 func ParseTestCaseBySelector(selector string) (*TestCase, error) {
+	selector = strings.Replace(selector, "+", "%2B", -1)
 	u, err := url.Parse(selector)
 	if err != nil {
 		return nil, err
