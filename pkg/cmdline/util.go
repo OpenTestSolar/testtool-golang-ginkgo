@@ -2,6 +2,7 @@ package cmdline
 
 import (
 	"log"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -14,8 +15,22 @@ func removeTestCaseLabels(tcNames []string) []string {
 		log.Printf("Failed to replace labels, please check if the regular expression is correct: %v", err)
 		return tcNames
 	}
+	mark := os.Getenv("TESTSOLAR_TTP_LABELMARK")
 	for _, name := range tcNames {
-		replacedName := re.ReplaceAllString(name, "")
+		replace := false
+		labels := re.FindAllString(name, -1)
+		for _, label := range labels {
+			if mark != "" && strings.Contains(label, mark) {
+				replace = true
+				break
+			}
+		}
+		var replacedName string
+		if replace {
+			replacedName = re.ReplaceAllString(name, "")
+		} else {
+			replacedName = name
+		}
 		replacedNames = append(replacedNames, replacedName)
 	}
 	return replacedNames

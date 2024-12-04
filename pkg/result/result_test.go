@@ -19,6 +19,8 @@ func TestParseJsonToObj(t *testing.T) {
 			t.Errorf("incorrect case name: %s", result.Test.Name)
 		}
 	}
+	results[0].Test.Attributes["owner"] = "tom"
+	results[0].Test.Attributes["description"] = "demo test"
 
 	parser, err = NewResultParser("./testdata/report_with_setup.json", "/data/workspace", "suites/demo", "", true)
 	assert.NoError(t, err)
@@ -37,7 +39,7 @@ func TestParseJsonToObj(t *testing.T) {
 	results, err = parser.Parse()
 	assert.NoError(t, err)
 	assert.Len(t, results, 1)
-	if results[0].Test.Name != "suites/demo/demo_suite_test.go?HierarchyText01 HierarchyText02   Text [label01, label02, label11, node-label01]" {
+	if results[0].Test.Name != "suites/demo/demo_suite_test.go?HierarchyText01 HierarchyText02   Text" {
 		t.Errorf("incorrect case name: %s", results[0].Test.Name)
 	}
 
