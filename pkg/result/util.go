@@ -1,7 +1,6 @@
 package result
 
 import (
-	"fmt"
 	"strings"
 
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
@@ -32,14 +31,6 @@ func getLabels(hierarchyLabels [][]string, nodeLabels []string) []string {
 		}
 	}
 	return labels
-}
-
-func addLabels(specName string, hierarchyLabels [][]string, nodeLabels []string) string {
-	labels := getLabels(hierarchyLabels, nodeLabels)
-	if len(labels) != 0 {
-		specName += " " + fmt.Sprintf("[%s]", strings.Join(labels, ", "))
-	}
-	return specName
 }
 
 func splitByNewline(s string) []string {
