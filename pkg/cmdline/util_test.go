@@ -6,11 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRemoveTestCaseLabels(t *testing.T) {
-	result := removeTestCaseLabels([]string{"case01 [label01]", "case02 [label02]"})
-	assert.Equal(t, result, []string{"case01", "case02"})
-}
-
 func TestGenTestCaseFocusName(t *testing.T) {
 	focusName := GenTestCaseFocusName([]string{"[(case01)]", "case02"})
 	assert.Equal(t, focusName, "\\[\\(case01\\)\\]|case02")
