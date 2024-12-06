@@ -70,7 +70,10 @@
           "FileName": "/data/workspace/test/test_test.go",
           "LineNumber": 30
         },
-        "LeafNodeLabels": [],
+        "LeafNodeLabels": [
+          "owner: tom",
+          "description: demo test"
+        ],
         "LeafNodeText": "Sorted",
         "State": "passed",
         "StartTime": "2024-04-25T14:26:26.542059541+08:00",

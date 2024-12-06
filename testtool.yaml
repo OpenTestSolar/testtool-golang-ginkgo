@@ -3,7 +3,7 @@ name: ginkgo
 nameZh: Ginkgo自动化测试工具
 lang: golang
 langType: COMPILED
-version: '0.2.43'
+version: '0.2.45'
 description: Ginkgo自动化测试工具
 defaultBaseImage: golang:1.22
 scaffoldRepo: https://github.com/OpenTestSolar/testtool-scaffold-ginkgo
@@ -11,44 +11,15 @@ indexFile: https://testsolar-1321258242.cos.ap-guangzhou.myqcloud.com/testtools/
 versionFile: https://testsolar-1321258242.cos.ap-guangzhou.myqcloud.com/testtools/golang/ginkgo/metadata.json
 homePage: https://github.com/OpenTestSolar/testtool-golang-ginkgo
 parameterDefs:
-  - name: workerCount
-    value: 并发数
-    desc: 并发数
-    default: "0"
-    inputWidget: number
   - name: parseMode
     value: 加载用例的模式
     desc: 加载用例的模式
     default: "ast"
     inputWidget: text
-  - name: showSetup
-    default: "false"
-    value: 上报测试套Before/After
-    desc: 将测试套的before suite以及after suite作为测试用例上报
-    choices:
-      - desc: 是
-        value: 'true'
-        displayName: 是
-      - desc: 否
-        value: 'false'
-        displayName: 否
-    inputWidget: choices
   - name: withLabels
     default: "false"
-    value: 用例中是否包含标签
-    desc: 用例中是否包含标签
-    choices:
-      - desc: 是
-        value: 'true'
-        displayName: 是
-      - desc: 否
-        value: 'false'
-        displayName: 否
-    inputWidget: choices
-  - name: splitBySpace
-    default: "false"
-    value: 上报用例名是否以空格分割
-    desc: 上报用例名是否以空格分割
+    value: 解析的用例名中是否需要包含标签
+    desc: 解析的用例名中是否需要包含标签
     choices:
       - desc: 是
         value: 'true'
