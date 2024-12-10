@@ -44,6 +44,16 @@ func TestParseJsonToObj(t *testing.T) {
 		t.Errorf("incorrect case name: %s", results[0].Test.Name)
 	}
 
+	os.Unsetenv("TESTSOLAR_TTP_WITHLABELS")
+	parser, err = NewResultParser("./testdata/report_with_labels.json", "/data/workspace", "suites/demo", "", true)
+	assert.NoError(t, err)
+	results, err = parser.Parse()
+	assert.NoError(t, err)
+	assert.Len(t, results, 1)
+	if results[0].Test.Name != "suites/demo/demo_suite_test.go?HierarchyText01 HierarchyText02   Text" {
+		t.Errorf("incorrect case name: %s", results[0].Test.Name)
+	}
+
 	parser, err = NewResultParser("./testdata/report_with_failed_setup.json", "/data/workspace", "suites/demo", "", true)
 	assert.NoError(t, err)
 	results, err = parser.Parse()

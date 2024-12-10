@@ -101,6 +101,8 @@ func (s *Spec) getContainerAndLeafName() (string, string) {
 		containerName = strings.Join(filteredContainerTests, " ")
 		if ok, err := strconv.ParseBool(os.Getenv("TESTSOLAR_TTP_WITHLABELS")); err == nil && ok {
 			leafName = addLabels(s.LeafNodeText, s.ContainerHierarchyLabels, s.LeafNodeLabels)
+		} else {
+			leafName = s.LeafNodeText
 		}
 	}
 	return containerName, leafName
