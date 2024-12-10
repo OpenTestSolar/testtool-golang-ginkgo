@@ -24,15 +24,6 @@ func (tc *TestCase) GetSelector() string {
 	return strSelector
 }
 
-func parseAttrSliceValue(rawString string) ([]string, error) {
-	var result []string
-	err := json.Unmarshal([]byte(rawString), &result)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
 // func (tc *TestCase) MatchAttr(attr map[string]string) bool {
 // 	if len(attr) == 0 {
 // 		// 若不指定属性，则直接返回true
