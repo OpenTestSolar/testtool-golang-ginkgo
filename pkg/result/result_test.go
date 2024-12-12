@@ -34,7 +34,7 @@ func TestParseJsonToObj(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, results, 1)
 
-	os.Setenv("TESTSOLAR_TTP_WITHLABELS", "1")
+	os.Setenv("TESTSOLAR_TTP_WITHOUTLABELS", "0")
 	parser, err = NewResultParser("./testdata/report_with_labels.json", "/data/workspace", "suites/demo", "", true)
 	assert.NoError(t, err)
 	results, err = parser.Parse()
@@ -44,7 +44,7 @@ func TestParseJsonToObj(t *testing.T) {
 		t.Errorf("incorrect case name: %s", results[0].Test.Name)
 	}
 
-	os.Unsetenv("TESTSOLAR_TTP_WITHLABELS")
+	os.Setenv("TESTSOLAR_TTP_WITHOUTLABELS", "1")
 	parser, err = NewResultParser("./testdata/report_with_labels.json", "/data/workspace", "suites/demo", "", true)
 	assert.NoError(t, err)
 	results, err = parser.Parse()
