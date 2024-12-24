@@ -97,8 +97,7 @@ func (s *Spec) getContainerAndLeafName() (string, string) {
 			}
 		}
 		containerName = strings.Join(filteredContainerTests, " ")
-		// TODO: 确定具体分割符标识
-		leafName = addLabels(s.LeafNodeText, s.ContainerHierarchyLabels, s.LeafNodeLabels)
+		leafName = s.LeafNodeText
 	}
 	return containerName, leafName
 }
