@@ -3,10 +3,12 @@ package testcase
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/url"
 	"os"
 	"strings"
 
+	ginkgoUtil "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/util"
 	sdkModel "github.com/OpenTestSolar/testtool-sdk-golang/model"
 )
 
@@ -24,46 +26,55 @@ func (tc *TestCase) GetSelector() string {
 	return strSelector
 }
 
-// func (tc *TestCase) MatchAttr(attr map[string]string) bool {
-// 	if len(attr) == 0 {
-// 		// 若不指定属性，则直接返回true
-// 		return true
-// 	}
-// 	for key, value := range attr {
-// 		var valueList []string
-// 		if strings.Contains(value, ",") {
-// 			pars := strings.Split(value, ",")
-// 			for _, v := range pars {
-// 				valueList = append(valueList, strings.TrimSpace(v))
-// 			}
-// 		} else {
-// 			valueList = []string{strings.TrimSpace(value)}
-// 		}
-// 		// 若指定属性不存在，则直接返回false
-// 		if _, ok := tc.Attributes[key]; !ok {
-// 			return false
-// 		}
-// 		// 若属性值为空则直接返回false
-// 		if tc.Attributes[key] == "" {
-// 			return false
-// 		}
-// 		strListValue, err := parseAttrSliceValue(tc.Attributes[key])
-// 		if err != nil {
-// 			log.Printf("[Plugin] parse attr value %s failed, err: %v", tc.Attributes[key], err)
-// 			strListValue = []string{tc.Attributes[key]}
-// 		}
-// 		for _, v := range valueList {
-// 			// 若任何一个期望属性与用例属性相匹配则返回true
-// 			if strListValue != nil {
-// 				if ginkgoUtil.ElementIsInSlice(v, strListValue) {
-// 					return true
-// 				}
-// 			}
-// 		}
-// 	}
-// 	// 执行到这一步表示下发的期望属性存在于用例用例中，但是具体的属性值与用例属性值没有匹配上，所以返回false
-// 	return false
-// }
+func parseAttrSliceValue(rawString string) ([]string, error) {
+	var result []string
+	err := json.Unmarshal([]byte(rawString), &result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (tc *TestCase) MatchAttr(attr map[string]string) bool {
+	if len(attr) == 0 {
+		// 若不指定属性，则直接返回true
+		return true
+	}
+	for key, value := range attr {
+		var valueList []string
+		if strings.Contains(value, ",") {
+			pars := strings.Split(value, ",")
+			for _, v := range pars {
+				valueList = append(valueList, strings.TrimSpace(v))
+			}
+		} else {
+			valueList = []string{strings.TrimSpace(value)}
+		}
+		// 若指定属性不存在，则直接返回false
+		if _, ok := tc.Attributes[key]; !ok {
+			return false
+		}
+		// 若属性值为空则直接返回false
+		if tc.Attributes[key] == "" {
+			return false
+		}
+		strListValue, err := parseAttrSliceValue(tc.Attributes[key])
+		if err != nil {
+			log.Printf("[Plugin] parse attr value %s failed, err: %v", tc.Attributes[key], err)
+			strListValue = []string{tc.Attributes[key]}
+		}
+		for _, v := range valueList {
+			// 若任何一个期望属性与用例属性相匹配则返回true
+			if strListValue != nil {
+				if ginkgoUtil.ElementIsInSlice(v, strListValue) {
+					return true
+				}
+			}
+		}
+	}
+	// 执行到这一步表示下发的期望属性存在于用例用例中，但是具体的属性值与用例属性值没有匹配上，所以返回false
+	return false
+}
 
 func ParseTestCaseBySelector(selector string) (*TestCase, error) {
 	selector = strings.Replace(selector, "+", "%2B", -1)
