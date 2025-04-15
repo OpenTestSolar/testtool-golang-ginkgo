@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -99,11 +97,8 @@ func (s *Spec) getContainerAndLeafName() (string, string) {
 			}
 		}
 		containerName = strings.Join(filteredContainerTests, " ")
-		if ok, _ := strconv.ParseBool(os.Getenv("TESTSOLAR_TTP_WITHOUTLABELS")); !ok {
-			leafName = addLabels(s.LeafNodeText, s.ContainerHierarchyLabels, s.LeafNodeLabels)
-		} else {
-			leafName = s.LeafNodeText
-		}
+		// TODO: 确定具体分割符标识
+		leafName = addLabels(s.LeafNodeText, s.ContainerHierarchyLabels, s.LeafNodeLabels)
 	}
 	return containerName, leafName
 }

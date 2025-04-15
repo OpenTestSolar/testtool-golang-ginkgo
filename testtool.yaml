@@ -3,7 +3,7 @@ name: ginkgo
 nameZh: Ginkgo自动化测试工具
 lang: golang
 langType: COMPILED
-version: '0.2.49'
+version: '0.2.50'
 description: Ginkgo自动化测试工具
 defaultBaseImage: golang:1.22
 scaffoldRepo: https://github.com/OpenTestSolar/testtool-scaffold-ginkgo
@@ -16,18 +16,6 @@ parameterDefs:
     desc: 加载用例的模式
     default: "ast"
     inputWidget: text
-  - name: withoutLabels
-    default: "false"
-    value: 解析的用例名中是否不需要包含标签
-    desc: 解析的用例名中是否不需要包含标签
-    choices:
-      - desc: 是
-        value: 'true'
-        displayName: 是
-      - desc: 否
-        value: 'false'
-        displayName: 否
-    inputWidget: choices
   - name: concurrentBuild
     default: "false"
     value: 并发编译
