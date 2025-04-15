@@ -37,7 +37,7 @@ jobs:
           working-directory: .
       - name: Run tests and check coverage
         run: |
-          ./coverage.sh
+          ./check.sh
   meta-check:
     runs-on: ubuntu-latest
     steps:
