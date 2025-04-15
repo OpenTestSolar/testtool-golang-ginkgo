@@ -128,6 +128,7 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 				Attributes: map[string]string{
 					"nameList": nameList,
 					"label":    labelList,
+					"tags":     labelList,
 				},
 			},
 			StartTime:  spec.StartTime,
