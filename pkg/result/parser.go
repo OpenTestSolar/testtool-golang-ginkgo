@@ -109,9 +109,19 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 			nameList = string(marshalNameList)
 		}
 		var labelList string
+		var owner string
+		var description string
 		if labels := getLabels(spec.ContainerHierarchyLabels, spec.LeafNodeLabels); len(labels) > 0 {
 			if marshalLabelList, err := json.Marshal(labels); err == nil {
 				labelList = string(marshalLabelList)
+			}
+			for _, label := range labels {
+				if strings.HasPrefix(label, "owner:") {
+					owner = strings.TrimSpace(strings.TrimPrefix(label, "owner:"))
+				}
+				if strings.HasPrefix(label, "description:") {
+					description = strings.TrimSpace(strings.TrimPrefix(label, "description:"))
+				}
 			}
 		}
 		steps := spec.GenerateSteps()
@@ -126,9 +136,11 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 			Test: &sdkModel.TestCase{
 				Name: name,
 				Attributes: map[string]string{
-					"nameList": nameList,
-					"label":    labelList,
-					"tags":     labelList,
+					"nameList":    nameList,
+					"label":       labelList,
+					"tags":        labelList,
+					"owner":       owner,
+					"description": description,
 				},
 			},
 			StartTime:  spec.StartTime,

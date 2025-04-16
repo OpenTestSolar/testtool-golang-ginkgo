@@ -149,7 +149,8 @@ func discoverExecutableTestcases(testcases []*ginkgoTestcase.TestCase) ([]*ginkg
 		if err != nil {
 			preCompileFile := findCompileBinary(filepath.Dir(testcase.Path))
 			if preCompileFile == "" {
-				return nil, pkgErrors.Wrapf(err, "get file info %s failed and there is no precompiled binary file", testcase.Path)
+				log.Printf("[PLUGIN]get file info %s failed and there is no precompiled binary file, err: %s", testcase.Path, err.Error())
+				continue
 			}
 			log.Printf("[PLUGIN]can't find testcase file %s, but find precompiled binary file %s", testcase.Path, preCompileFile)
 			testcase.Path = strings.TrimSuffix(preCompileFile, ".test")
