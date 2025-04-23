@@ -77,15 +77,6 @@ func ReportTestcases(testcases []*ginkgoTestcase.TestCase, loadErrors []*sdkMode
 	return nil
 }
 
-func containTestCase(testcases []*ginkgoTestcase.TestCase, testcase *ginkgoTestcase.TestCase) bool {
-	for _, t := range testcases {
-		if t.Path == testcase.Path && t.Name == testcase.Name {
-			return true
-		}
-	}
-	return false
-}
-
 func LoadTestcases(projPath string, targetSelectors []*ginkgoSelector.TestSelector) ([]*ginkgoTestcase.TestCase, []*sdkModel.LoadError) {
 	var testcases []*ginkgoTestcase.TestCase
 	var loadErrors []*sdkModel.LoadError
@@ -97,13 +88,7 @@ func LoadTestcases(projPath string, targetSelectors []*ginkgoSelector.TestSelect
 		}
 		loadedSelectorPath[testSelector.Path] = struct{}{}
 		loadedTestcases, lErrors := ginkgoLoader.LoadTestCase(projPath, testSelector.Path)
-		for _, loadedTestcase := range loadedTestcases {
-			if loadedTestcase.MatchAttr(testSelector.Attributes) && !containTestCase(testcases, loadedTestcase) {
-				testcases = append(testcases, loadedTestcase)
-			} else {
-				log.Printf("[Plugin] testcase %s not match selector attribute %v", loadedTestcase.GetSelector(), testSelector.Attributes)
-			}
-		}
+		testcases = append(testcases, loadedTestcases...)
 		loadErrors = append(loadErrors, lErrors...)
 	}
 	return testcases, loadErrors
