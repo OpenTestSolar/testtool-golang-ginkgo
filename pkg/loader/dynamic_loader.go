@@ -82,12 +82,15 @@ func ginkgo_v2_load(projPath, path, pkgBin string) ([]*ginkgoTestcase.TestCase, 
 		cmdline = "ginkgo --v --dry-run --no-color --json-report=report.json ."
 		workDir = filepath.Join(projPath, path)
 	}
+	reportJson := filepath.Join(workDir, "report.json")
+	if err := os.Remove(reportJson); err != nil {
+		log.Printf("remove report json file %s failed, err: %v", reportJson, err)
+	}
 	log.Printf("dry run cmd: %s\nwork directory: %s", cmdline, workDir)
 	stdout, stderr, err := ginkgoUtil.RunCommandWithOutput(cmdline, workDir)
 	if err != nil {
 		return nil, fmt.Errorf("dry run command %s failed, err: %v", cmdline, err)
 	}
-	reportJson := filepath.Join(workDir, "report.json")
 	if exists, err := ginkgoUtil.FileExists(reportJson); err != nil || !exists {
 		log.Printf("dry run report json file not exists, try to parse cases by stdout")
 		testcaseList, errInfo := ginkgoResult.ParseCaseByReg(projPath, stdout, 2, path)
