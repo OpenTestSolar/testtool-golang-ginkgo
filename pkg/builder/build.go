@@ -26,7 +26,7 @@ const (
 func Build(projPath string) error {
 	var packageList []string
 	err := filepath.Walk(projPath, func(path string, fi os.FileInfo, _ error) error {
-		if strings.HasSuffix(path, "_suite_test.go") {
+		if strings.HasSuffix(path, "_suite_test.go") && !strings.Contains(path, ".testtool") {
 			packagePath := filepath.Dir(path)
 			if packagePath == projPath {
 				packagePath = ""
