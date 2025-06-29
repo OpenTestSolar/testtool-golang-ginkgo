@@ -141,6 +141,7 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 					"tags":        labelList,
 					"owner":       owner,
 					"description": description,
+					"name":        specName,
 				},
 			},
 			StartTime:  spec.StartTime,
