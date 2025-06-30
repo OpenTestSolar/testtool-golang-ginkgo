@@ -136,12 +136,12 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 			Test: &sdkModel.TestCase{
 				Name: name,
 				Attributes: map[string]string{
-					"nameList":    nameList,
-					"label":       labelList,
-					"tags":        labelList,
-					"owner":       owner,
-					"description": description,
-					"name":        specName,
+					"nameList":               nameList,
+					"label":                  labelList,
+					"tags":                   labelList,
+					"owner":                  owner,
+					"description":            description,
+					"testsolar_requests_key": specName,
 				},
 			},
 			StartTime:  spec.StartTime,
