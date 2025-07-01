@@ -141,7 +141,7 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 					"tags":                   labelList,
 					"owner":                  owner,
 					"description":            description,
-					"testsolar_requests_key": specName,
+					"testsolar_requests_key": spec.getSpecName(),
 				},
 			},
 			StartTime:  spec.StartTime,

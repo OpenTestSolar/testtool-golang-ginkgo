@@ -109,6 +109,23 @@ func (s *Spec) getContainerAndLeafName() (string, string) {
 	return containerName, leafName
 }
 
+func (s *Spec) getSpecName() string {
+	if s.ContainerHierarchyTexts == nil {
+		return s.LeafNodeType
+	}
+	var filteredContainerTests []string
+	for _, cn := range s.ContainerHierarchyTexts {
+		if cn != "" {
+			filteredContainerTests = append(filteredContainerTests, cn)
+		}
+	}
+	specName := strings.Join(filteredContainerTests, " ")
+	if s.LeafNodeText != "" {
+		specName += " " + s.LeafNodeText
+	}
+	return specName
+}
+
 func (s *Spec) getStepsByOutputLines(output string) []*sdkModel.TestCaseStep {
 	outputs := splitByNewline(output)
 	var steps []*sdkModel.TestCaseStep
