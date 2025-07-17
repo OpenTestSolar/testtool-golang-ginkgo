@@ -97,8 +97,12 @@ func LoadTestcases(projPath string, targetSelectors []*ginkgoSelector.TestSelect
 		}
 		if parseMode := os.Getenv("TESTSOLAR_TTP_PARSEMODE"); parseMode == "dynamic" && isFile(projPath, testSelector.Path) {
 			// 如果当前为动态解析模式，并且选择器为一个文件，则需要将文件所在包放入到已加载的包列表中，避免后续对相同包下的用例进行重复加载
-			selectorDir := filepath.Dir(testSelector.Path)
-			loadedSelectorPath[selectorDir] = struct{}{}
+			packageDir := filepath.Dir(testSelector.Path)
+			if _, ok := loadedSelectorPath[packageDir]; ok {
+				continue
+			} else {
+				loadedSelectorPath[packageDir] = struct{}{}
+			}
 		}
 		loadedSelectorPath[testSelector.Path] = struct{}{}
 		loadedTestcases, lErrors := ginkgoLoader.LoadTestCase(projPath, testSelector.Path)
