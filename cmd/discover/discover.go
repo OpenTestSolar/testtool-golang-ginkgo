@@ -3,6 +3,7 @@ package discover
 import (
 	"log"
 	"os"
+	"path/filepath"
 
 	ginkgoLoader "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/loader"
 	ginkgoSelector "github.com/OpenTestSolar/testtool-golang-ginkgo/pkg/selector"
@@ -77,6 +78,14 @@ func ReportTestcases(testcases []*ginkgoTestcase.TestCase, loadErrors []*sdkMode
 	return nil
 }
 
+func isFile(projectPath, selector string) bool {
+	fileInfo, err := os.Stat(filepath.Join(projectPath, selector))
+	if err != nil {
+		return false
+	}
+	return !fileInfo.IsDir()
+}
+
 func LoadTestcases(projPath string, targetSelectors []*ginkgoSelector.TestSelector) ([]*ginkgoTestcase.TestCase, []*sdkModel.LoadError) {
 	var testcases []*ginkgoTestcase.TestCase
 	var loadErrors []*sdkModel.LoadError
@@ -85,6 +94,11 @@ func LoadTestcases(projPath string, targetSelectors []*ginkgoSelector.TestSelect
 		// skip the path that has been loaded
 		if _, ok := loadedSelectorPath[testSelector.Path]; ok {
 			continue
+		}
+		if parseMode := os.Getenv("TESTSOLAR_TTP_PARSEMODE"); parseMode == "dynamic" && isFile(projPath, testSelector.Path) {
+			// 如果当前为动态解析模式，并且选择器为一个文件，则需要将文件所在包放入到已加载的包列表中，避免后续对相同包下的用例进行重复加载
+			selectorDir := filepath.Dir(testSelector.Path)
+			loadedSelectorPath[selectorDir] = struct{}{}
 		}
 		loadedSelectorPath[testSelector.Path] = struct{}{}
 		loadedTestcases, lErrors := ginkgoLoader.LoadTestCase(projPath, testSelector.Path)
