@@ -30,11 +30,11 @@ func TestGenarateCommandLine(t *testing.T) {
 	cmdline = genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin, tcNames, true)
 	assert.Equal(t, expected, cmdline, "should return the expected command line")
 	extraArgs = `--ginkgo.label-filter "( label01||label02)"`
-	expected = "suite.test --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report=\"output.json\" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus=\"case01|case02\" --ginkgo.label-filter \"( label01||label02)\""
+	expected = "suite.test --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report=\"output.json\" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus=\"case01$|case02$\" --ginkgo.label-filter \"( label01||label02)\""
 	cmdline = genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin, tcNames, false)
 	assert.Equal(t, expected, cmdline, "should return the expected command line")
 	extraArgs = ""
-	expected = "suite.test --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report=\"output.json\" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus=\"case01|case02\""
+	expected = "suite.test --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report=\"output.json\" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus=\"case01$|case02$\""
 	cmdline = genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin, tcNames, false)
 	assert.Equal(t, expected, cmdline, "should return the expected command line")
 }
@@ -95,7 +95,7 @@ func Test_regenerateDryRunCmd(t *testing.T) {
 	dryRunCmd, err := regenerateDryRunCmd(`ginkgo --v --no-color --trace --json-report output.json --output-dir /data/workspace --always-emit-ginkgo-writer --procs "10" --timeout "5h" --label-filter "(label01)" /data/workspace.test`, []string{})
 	assert.NoError(t, err)
 	assert.Equal(t, dryRunCmd, `ginkgo --dry-run --v --no-color --trace --json-report "output.json" --output-dir "/data/workspace" --timeout "5h" --label-filter "(label01)" /data/workspace.test`)
-	dryRunCmd, err = regenerateDryRunCmd(`ginkgo --v --no-color --trace --json-report output.json --output-dir /data/workspace --always-emit-ginkgo-writer --procs "10" --timeout "5h" --label-filter "(label01)" --focus "\[cls\] 环境变量 采集volume|\[cls\] 环境变量 采集容器路径且包含中文日志" /data/workspace.test`, []string{"[cls] 环境变量 采集volume", "[cls] 环境变量 采集容器路径且包含中文日志"})
+	dryRunCmd, err = regenerateDryRunCmd(`ginkgo --v --no-color --trace --json-report output.json --output-dir /data/workspace --always-emit-ginkgo-writer --procs "10" --timeout "5h" --label-filter "(label01)" --focus "\[cls\] 环境变量 采集volume$|\[cls\] 环境变量 采集容器路径且包含中文日志$" /data/workspace.test`, []string{"[cls] 环境变量 采集volume", "[cls] 环境变量 采集容器路径且包含中文日志"})
 	assert.NoError(t, err)
-	assert.Equal(t, dryRunCmd, `ginkgo --dry-run --focus "\[cls\] 环境变量 采集volume|\[cls\] 环境变量 采集容器路径且包含中文日志" --v --no-color --trace --json-report "output.json" --output-dir "/data/workspace" --timeout "5h" --label-filter "(label01)" /data/workspace.test`)
+	assert.Equal(t, dryRunCmd, `ginkgo --dry-run --focus "\[cls\] 环境变量 采集volume$|\[cls\] 环境变量 采集容器路径且包含中文日志$" --v --no-color --trace --json-report "output.json" --output-dir "/data/workspace" --timeout "5h" --label-filter "(label01)" /data/workspace.test`)
 }

@@ -1,6 +1,7 @@
 package cmdline
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -33,7 +34,7 @@ func GenTestCaseFocusName(tcNames []string) string {
 	var escapedNames []string
 	for _, name := range tcNames {
 		// 将双引号转义
-		escapedNames = append(escapedNames, strings.Replace(regexp.QuoteMeta(name), "\"", "\\\"", -1))
+		escapedNames = append(escapedNames, fmt.Sprintf("%s$", strings.Replace(regexp.QuoteMeta(name), "\"", "\\\"", -1)))
 	}
 	if len(escapedNames) == 0 {
 		return ""
