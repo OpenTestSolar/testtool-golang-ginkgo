@@ -1,0 +1,236 @@
+[
+  {
+    "SuitePath": "/data/testtool-golang-ginkgo/testdata",
+    "SuiteDescription": "Ginkgo Suite",
+    "SuiteLabels": [],
+    "SuiteSucceeded": false,
+    "SuiteHasProgrammaticFocus": false,
+    "SpecialSuiteFailureReasons": null,
+    "PreRunStats": {
+      "TotalSpecs": 5,
+      "SpecsThatWillRun": 2
+    },
+    "StartTime": "2026-01-06T17:19:24.017910659+08:00",
+    "EndTime": "2026-01-06T17:19:24.01858252+08:00",
+    "RunTime": 671861,
+    "SuiteConfig": {
+      "RandomSeed": 1767691164,
+      "RandomizeAllSpecs": false,
+      "FocusStrings": [
+        "Testcase cont demo test$|Testcase cont demo test2$|Testcase \\[cont3\\]$"
+      ],
+      "SkipStrings": null,
+      "FocusFiles": null,
+      "SkipFiles": null,
+      "LabelFilter": "",
+      "FailOnPending": false,
+      "FailFast": false,
+      "FlakeAttempts": 0,
+      "EmitSpecProgress": false,
+      "DryRun": false,
+      "Timeout": 3599999944025,
+      "OutputInterceptorMode": "",
+      "ParallelProcess": 1,
+      "ParallelTotal": 1,
+      "ParallelHost": ""
+    },
+    "SpecReports": [
+      {
+        "ContainerHierarchyTexts": [
+          "Testcase02",
+          "test data",
+          "test data"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 47
+          },
+          {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 48
+          },
+          {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 49
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          [],
+          [
+            "label01"
+          ]
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+          "LineNumber": 50
+        },
+        "LeafNodeLabels": [
+          "label02"
+        ],
+        "LeafNodeText": "test get data successfully",
+        "State": "skipped",
+        "StartTime": "2026-01-06T17:19:24.018033479+08:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Testcase",
+          "cont"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 14
+          },
+          {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 15
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+          "LineNumber": 16
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "demo test",
+        "State": "passed",
+        "StartTime": "2026-01-06T17:19:24.018096758+08:00",
+        "EndTime": "2026-01-06T17:19:24.018254445+08:00",
+        "RunTime": 157687,
+        "ParallelProcess": 1,
+        "NumAttempts": 1
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Testcase",
+          "cont"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 14
+          },
+          {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 15
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+          "LineNumber": 20
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "demo test2",
+        "State": "failed",
+        "StartTime": "2026-01-06T17:19:24.018295512+08:00",
+        "EndTime": "2026-01-06T17:19:24.018506578+08:00",
+        "RunTime": 211066,
+        "ParallelProcess": 1,
+        "Failure": {
+          "Message": "Expected\n    \u003cint\u003e: 300\nto equal\n    \u003cint\u003e: 200",
+          "Location": {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 22,
+            "FullStackTrace": "testdata/demo.init.func1.1.2()\n\t/data/testtool-golang-ginkgo/testdata/demo/demo_test.go:22 +0x9b"
+          },
+          "FailureNodeContext": "leaf-node",
+          "FailureNodeType": "It",
+          "FailureNodeLocation": {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 20
+          },
+          "FailureNodeContainerIndex": 0
+        },
+        "NumAttempts": 1
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Testcase",
+          "[cont3]"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 14
+          },
+          {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 25
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+          "LineNumber": 26
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "[demo test3]",
+        "State": "skipped",
+        "StartTime": "2026-01-06T17:19:24.018562683+08:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Testcase01",
+          "test data",
+          "test data"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 33
+          },
+          {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 38
+          },
+          {
+            "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+            "LineNumber": 39
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/data/testtool-golang-ginkgo/testdata/demo/demo_test.go",
+          "LineNumber": 40
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "test get data successfully",
+        "State": "skipped",
+        "StartTime": "2026-01-06T17:19:24.018574505+08:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0
+      }
+    ]
+  }
+]

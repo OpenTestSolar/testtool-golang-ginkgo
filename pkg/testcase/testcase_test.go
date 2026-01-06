@@ -76,6 +76,11 @@ func TestParseTestCaseBySelector(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, testCase5.Path, "path/to/test")
 	assert.Equal(t, testCase5.Name, "[+]")
+	// 测试用例6：包含&符号
+	testCase6, err := ParseTestCaseBySelector("path?testname&xxx")
+	assert.NoError(t, err)
+	assert.Equal(t, testCase6.Path, "path")
+	assert.Equal(t, testCase6.Name, "testname&xxx")
 }
 
 func TestGetSelector(t *testing.T) {
