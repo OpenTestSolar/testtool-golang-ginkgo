@@ -105,8 +105,8 @@ func ParseTestCaseBySelector(selector string) (*TestCase, error) {
 			}
 		}
 	}
-	if name == "" && strings.Contains(rawQuery, "&") {
-		log.Printf("[Plugin] case name contain `&`, selector: %s", selector)
+	if name == "" && (strings.Contains(rawQuery, "&") || strings.Contains(rawQuery, "=")) {
+		log.Printf("[Plugin] case name contain `&` or `=`, selector: %s", selector)
 		name = rawQuery
 	}
 	testCase := &TestCase{
