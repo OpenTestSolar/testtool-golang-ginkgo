@@ -81,6 +81,11 @@ func TestParseTestCaseBySelector(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, testCase6.Path, "path")
 	assert.Equal(t, testCase6.Name, "testname&xxx")
+	// 测试用例7：包含等号
+	testCase7, err := ParseTestCaseBySelector("path?testname=xxx")
+	assert.NoError(t, err)
+	assert.Equal(t, testCase7.Path, "path")
+	assert.Equal(t, testCase7.Name, "testname=xxx")
 }
 
 func TestGetSelector(t *testing.T) {
