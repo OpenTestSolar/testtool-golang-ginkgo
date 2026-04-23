@@ -1,0 +1,208 @@
+[
+    {
+        "SuitePath": "/data/workspace",
+        "SuiteDescription": "testcase/media Testcase Suite",
+        "SuiteLabels": [],
+        "SuiteSemVerConstraints": [],
+        "SuiteComponentSemVerConstraints": {},
+        "SuiteSucceeded": false,
+        "SuiteHasProgrammaticFocus": false,
+        "SpecialSuiteFailureReasons": null,
+        "PreRunStats": {
+            "TotalSpecs": 48,
+            "SpecsThatWillRun": 25
+        },
+        "StartTime": "2026-04-23T14:34:06.047032433+08:00",
+        "EndTime": "2026-04-23T14:47:53.843353394+08:00",
+        "RunTime": 827796320941,
+        "SuiteConfig": {
+            "RandomSeed": 1776926046,
+            "RandomizeAllSpecs": false,
+            "FocusStrings": [
+                "ASR 语音识别 粤语音频转文字 天籁_粤语音频转文字_model_type为8$|ASR 语音识别 60秒音频转文字 天籁_60秒音频转文字_model_type为8$|ASR 语音识别 60秒音频转文字 混元_60秒音频转文字_model_type为1$|ASR 语音识别 60秒音频转文字 混元双发_60秒音频转文字_model_type为5$|ASR 语音识别 60秒音频转文字 混元双发_60秒音频转文字_model_type为6$|ASR 语音识别 60秒音频转文字 混元双发_60秒音频转文字_model_type为7$|ASR 语音识别 60秒音频转文字 火山_60秒音频转文字_model_type为2$|ASR 语音识别 中英文混合音频转文字 天籁_中英文混合音频转文字_model_type为8$|ASR 语音识别 中英文混合音频转文字 混元_中英文混合音频转文字_model_type为1$|ASR 语音识别 中英文混合音频转文字 混元双发_中英文混合音频转文字_model_type为5$|ASR 语音识别 中英文混合音频转文字 混元双发_中英文混合音频转文字_model_type为6$|ASR 语音识别 中英文混合音频转文字 混元双发_中英文混合音频转文字_model_type为7$|ASR 语音识别 50秒音频转文字 火山_50秒音频转文字_model_type为2$|ASR 语音识别 粤语音频转文字 混元_粤语音频转文字_model_type为1$|ASR 语音识别 粤语音频转文字 混元双发_粤语音频转文字_model_type为5$|ASR 语音识别 粤语音频转文字 混元双发_粤语音频转文字_model_type为6$|ASR 语音识别 粤语音频转文字 混元双发_粤语音频转文字_model_type为7$|ASR 语音识别 粤语音频转文字 火山_粤语音频转文字_model_type为2$|ASR 语音识别 英文音频转文字 天籁_英文音频转文字_model_type为8$|ASR 语音识别 英文音频转文字 混元_英文音频转文字_model_type为1$|ASR 语音识别 英文音频转文字 混元双发_英文音频转文字_model_type为5$|ASR 语音识别 英文音频转文字 混元双发_英文音频转文字_model_type为6$|ASR 语音识别 英文音频转文字 混元双发_英文音频转文字_model_type为7$|ASR 语音识别 英文音频转文字 火山_英文音频转文字_model_type为2$|ASR 语音识别 10秒音频转文字 火山_10秒音频转文字_model_type为2$"
+            ],
+            "SkipStrings": null,
+            "FocusFiles": null,
+            "SkipFiles": null,
+            "LabelFilter": "",
+            "SemVerFilter": "",
+            "FailOnPending": false,
+            "FailOnEmpty": false,
+            "FailFast": false,
+            "FlakeAttempts": 0,
+            "MustPassRepeatedly": 0,
+            "DryRun": false,
+            "PollProgressAfter": 0,
+            "PollProgressInterval": 0,
+            "Timeout": 3600000000000,
+            "EmitSpecProgress": false,
+            "OutputInterceptorMode": "",
+            "SourceRoots": null,
+            "GracePeriod": 30000000000,
+            "ParallelProcess": 1,
+            "ParallelTotal": 1,
+            "ParallelHost": ""
+        },
+        "SpecReports": [
+            {
+                "ContainerHierarchyTexts": [
+                    "ASR 语音识别",
+                    "10秒音频转文字"
+                ],
+                "ContainerHierarchyLocations": [
+                    {
+                        "FileName": "/data/workspace/testcase/media/asr_start_test.go",
+                        "LineNumber": 24
+                    },
+                    {
+                        "FileName": "/data/workspace/testcase/media/asr_start_test.go",
+                        "LineNumber": 31
+                    }
+                ],
+                "ContainerHierarchyLabels": [
+                    [
+                        "e2e",
+                        "asr"
+                    ],
+                    []
+                ],
+                "ContainerHierarchySemVerConstraints": [
+                    [],
+                    []
+                ],
+                "ContainerHierarchyComponentSemVerConstraints": [
+                    {},
+                    {}
+                ],
+                "LeafNodeType": "It",
+                "LeafNodeLocation": {
+                    "FileName": "/data/workspace/testcase/media/asr_start_test.go",
+                    "LineNumber": 79
+                },
+                "LeafNodeLabels": [
+                    "owner: cynthiama",
+                    "description: 验证火山_10秒音频转文字_model_type为2识别结果的文本相似度"
+                ],
+                "LeafNodeSemVerConstraints": [],
+                "LeafNodeText": "火山_10秒音频转文字_model_type为2",
+                "State": "passed",
+                "StartTime": "2026-04-23T14:34:06.061071994+08:00",
+                "EndTime": "2026-04-23T14:34:22.339426259+08:00",
+                "RunTime": 16278354242,
+                "ParallelProcess": 1,
+                "NumAttempts": 1,
+                "MaxFlakeAttempts": 0,
+                "MaxMustPassRepeatedly": 0,
+                "CapturedGinkgoWriterOutput": "2026/04/23 14:34:07 \n\n========== [步骤] 步骤1：创建对话获取 chat_id ==========\n\n2026/04/23 14:34:07 [CGI] \u003cpressure_test_iproject_a04f3ef289c5477b\u003e 创建对话: id=90dbc7f7-4028-49b2-abc3-f66c5d9e81fb\n2026/04/23 14:34:07 [ASR] 创建对话成功: chat_id=90dbc7f7-4028-49b2-abc3-f66c5d9e81fb\n2026/04/23 14:34:09 [CGI] \u003cpressure_test_iproject_a04f3ef289c5477b\u003e 聊天完成: body_len=113 think_len=0\n2026/04/23 14:34:12 \n\n========== [步骤] 步骤2：调用 ASR start 接口 (model_type=2) ==========\n\n2026/04/23 14:34:22 [Media] \u003cpressure_test_iproject_a04f3ef289c5477b\u003e startAsr: code=0\n2026/04/23 14:34:22 [ASR] 响应: code=0 asrText=从香港坐飞机飞成都要多长时间？\n2026/04/23 14:34:22 \n\n========== [步骤] 步骤3：验证 ASR 返回码 ==========\n\n2026/04/23 14:34:22 \n\n========== [步骤] 步骤4：校验 asrText 相似度 ==========\n\n2026/04/23 14:34:22 [ASR] normalized_actual: 从香港坐飞机飞成都要多长时间\n2026/04/23 14:34:22 [ASR] normalized_expected: 从香港坐飞机飞成都要多长时间\n2026/04/23 14:34:22 [ASR] similarity: 1.0000\n",
+                "SpecEvents": [
+                    {
+                        "SpecEventType": "Node",
+                        "CodeLocation": {
+                            "FileName": "/data/workspace/testcase/media/asr_start_test.go",
+                            "LineNumber": 26
+                        },
+                        "TimelineLocation": {
+                            "Order": 4,
+                            "Time": "2026-04-23T14:34:06.061099787+08:00"
+                        },
+                        "Message": "ASR 语音识别",
+                        "NodeType": "BeforeEach"
+                    },
+                    {
+                        "SpecEventType": "Node (End)",
+                        "CodeLocation": {
+                            "FileName": "/data/workspace/testcase/media/asr_start_test.go",
+                            "LineNumber": 26
+                        },
+                        "TimelineLocation": {
+                            "Order": 6,
+                            "Time": "2026-04-23T14:34:07.062027975+08:00"
+                        },
+                        "Message": "ASR 语音识别",
+                        "Duration": 1000928167,
+                        "NodeType": "BeforeEach"
+                    },
+                    {
+                        "SpecEventType": "Node",
+                        "CodeLocation": {
+                            "FileName": "/data/workspace/testcase/media/asr_start_test.go",
+                            "LineNumber": 79
+                        },
+                        "TimelineLocation": {
+                            "Order": 7,
+                            "Time": "2026-04-23T14:34:07.062033517+08:00"
+                        },
+                        "Message": "火山_10秒音频转文字_model_type为2",
+                        "NodeType": "It"
+                    },
+                    {
+                        "SpecEventType": "By",
+                        "CodeLocation": {
+                            "FileName": "/data/workspace/testcase/media/asr_start_test.go",
+                            "LineNumber": 80
+                        },
+                        "TimelineLocation": {
+                            "Order": 8,
+                            "Time": "2026-04-23T14:34:07.062067253+08:00"
+                        },
+                        "Message": "步骤1：创建对话获取 chat_id"
+                    },
+                    {
+                        "SpecEventType": "By",
+                        "CodeLocation": {
+                            "FileName": "/data/workspace/testcase/media/asr_start_test.go",
+                            "LineNumber": 84
+                        },
+                        "TimelineLocation": {
+                            "Offset": 411,
+                            "Order": 9,
+                            "Time": "2026-04-23T14:34:12.047499315+08:00"
+                        },
+                        "Message": "步骤2：调用 ASR start 接口"
+                    },
+                    {
+                        "SpecEventType": "By",
+                        "CodeLocation": {
+                            "FileName": "/data/workspace/testcase/media/asr_start_test.go",
+                            "LineNumber": 100
+                        },
+                        "TimelineLocation": {
+                            "Offset": 696,
+                            "Order": 10,
+                            "Time": "2026-04-23T14:34:22.339288215+08:00"
+                        },
+                        "Message": "步骤3：验证 ASR 返回码"
+                    },
+                    {
+                        "SpecEventType": "By",
+                        "CodeLocation": {
+                            "FileName": "/data/workspace/testcase/media/asr_start_test.go",
+                            "LineNumber": 104
+                        },
+                        "TimelineLocation": {
+                            "Offset": 781,
+                            "Order": 11,
+                            "Time": "2026-04-23T14:34:22.339348066+08:00"
+                        },
+                        "Message": "步骤4：校验 asrText 相似度"
+                    },
+                    {
+                        "SpecEventType": "Node (End)",
+                        "CodeLocation": {
+                            "FileName": "/data/workspace/testcase/media/asr_start_test.go",
+                            "LineNumber": 79
+                        },
+                        "TimelineLocation": {
+                            "Offset": 1093,
+                            "Order": 13,
+                            "Time": "2026-04-23T14:34:22.339421603+08:00"
+                        },
+                        "Message": "火山_10秒音频转文字_model_type为2",
+                        "Duration": 15277388085,
+                        "NodeType": "It"
+                    }
+                ]
+            }
+        ]
+    }
+]

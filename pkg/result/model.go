@@ -52,6 +52,29 @@ type FailureNodeLocation struct {
 	LineNumber int64
 }
 
+type TimelineLocation struct {
+	Order int64
+	Time  time.Time
+}
+
+type SpecEventCodeLocation struct {
+	FileName   string
+	LineNumber int64
+}
+
+type SpecEvent struct {
+	SpecEventType    string
+	CodeLocation     *SpecEventCodeLocation
+	TimelineLocation *TimelineLocation
+	Message          string
+	Duration         time.Duration
+	NodeType         string
+}
+
+func (e *SpecEvent) isByEvent() bool {
+	return e.SpecEventType == "By"
+}
+
 type Failure struct {
 	Message             string
 	Location            *FailureLocation
@@ -81,6 +104,7 @@ type Spec struct {
 	CapturedStdOutErr           string
 	CapturedGinkgoWriterOutput  string
 	ReportEntries               []*ReportEntry
+	SpecEvents                  []*SpecEvent
 	Failure                     *Failure
 	ParallelProcess             int64
 }
@@ -127,15 +151,17 @@ func (s *Spec) getSpecName() string {
 }
 
 func (s *Spec) getStepsByOutputLines(output string) []*sdkModel.TestCaseStep {
+	if len(s.ReportEntries) > 0 {
+		return s.getStepsByOutputFromEntries(output)
+	}
+	return s.getStepsByOutputFromSpecEvents(output)
+}
+
+func (s *Spec) getStepsByOutputFromEntries(output string) []*sdkModel.TestCaseStep {
 	outputs := splitByNewline(output)
 	var steps []*sdkModel.TestCaseStep
 	var lineIndex int
-	var resultType sdkModel.ResultType
-	if s.IsFailed() {
-		resultType = sdkModel.ResultTypeFailed
-	} else {
-		resultType = sdkModel.ResultTypeSucceed
-	}
+	resultType := s.getStepResultType()
 	for _, entry := range s.ReportEntries {
 		if !entry.isValidEntry() {
 			continue
@@ -158,7 +184,7 @@ func (s *Spec) getStepsByOutputLines(output string) []*sdkModel.TestCaseStep {
 			}
 			if isCurrStep && outputs[lineIndex] != "" {
 				logs = append(logs, &sdkModel.TestCaseLog{
-					Time:    entry.Time, //FIXME
+					Time:    entry.Time,
 					Level:   sdkModel.LogLevelInfo,
 					Content: outputs[lineIndex],
 				})
@@ -174,6 +200,86 @@ func (s *Spec) getStepsByOutputLines(output string) []*sdkModel.TestCaseStep {
 		})
 	}
 	return steps
+}
+
+func (s *Spec) getStepResultType() sdkModel.ResultType {
+	if s.IsFailed() {
+		return sdkModel.ResultTypeFailed
+	}
+	return sdkModel.ResultTypeSucceed
+}
+
+func (s *Spec) filterByEvents() []*SpecEvent {
+	var byEvents []*SpecEvent
+	for _, event := range s.SpecEvents {
+		if event.isByEvent() {
+			byEvents = append(byEvents, event)
+		}
+	}
+	return byEvents
+}
+
+type stepBoundary struct {
+	lineIndex int
+	event     *SpecEvent
+}
+
+func (s *Spec) findStepBoundaries(outputs []string, byEvents []*SpecEvent) []stepBoundary {
+	var boundaries []stepBoundary
+	searchStart := 0
+	for _, event := range byEvents {
+		for i := searchStart; i < len(outputs); i++ {
+			if strings.Contains(outputs[i], event.Message) {
+				boundaries = append(boundaries, stepBoundary{i, event})
+				searchStart = i + 1
+				break
+			}
+		}
+	}
+	return boundaries
+}
+
+func (s *Spec) buildStepsFromBoundaries(
+	outputs []string, boundaries []stepBoundary, resultType sdkModel.ResultType,
+) []*sdkModel.TestCaseStep {
+	var steps []*sdkModel.TestCaseStep
+	for i, b := range boundaries {
+		endIdx := len(outputs)
+		if i+1 < len(boundaries) {
+			endIdx = boundaries[i+1].lineIndex
+		}
+		var logs []*sdkModel.TestCaseLog
+		for j := b.lineIndex; j < endIdx; j++ {
+			if outputs[j] != "" {
+				logs = append(logs, &sdkModel.TestCaseLog{
+					Time:    b.event.TimelineLocation.Time,
+					Level:   sdkModel.LogLevelInfo,
+					Content: outputs[j],
+				})
+			}
+		}
+		steps = append(steps, &sdkModel.TestCaseStep{
+			StartTime:  b.event.TimelineLocation.Time,
+			EndTime:    b.event.TimelineLocation.Time.Add(b.event.Duration),
+			Title:      outputs[b.lineIndex],
+			Logs:       logs,
+			ResultType: resultType,
+		})
+	}
+	return steps
+}
+
+func (s *Spec) getStepsByOutputFromSpecEvents(output string) []*sdkModel.TestCaseStep {
+	outputs := splitByNewline(output)
+	byEvents := s.filterByEvents()
+	if len(byEvents) == 0 {
+		return nil
+	}
+	boundaries := s.findStepBoundaries(outputs, byEvents)
+	if len(boundaries) == 0 {
+		return nil
+	}
+	return s.buildStepsFromBoundaries(outputs, boundaries, s.getStepResultType())
 }
 
 func (s *Spec) generateDefaultStep(stderr string, stdout string) *sdkModel.TestCaseStep {
