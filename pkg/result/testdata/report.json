@@ -72,7 +72,8 @@
         },
         "LeafNodeLabels": [
           "owner: tom",
-          "description: demo test"
+          "description: demo test",
+          "priority: P0"
         ],
         "LeafNodeText": "Sorted",
         "State": "passed",

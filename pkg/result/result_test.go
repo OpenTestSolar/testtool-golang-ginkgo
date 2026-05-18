@@ -22,6 +22,7 @@ func TestParseJsonToObj(t *testing.T) {
 	}
 	assert.Equal(t, results[0].Test.Attributes["owner"], "tom")
 	assert.Equal(t, results[0].Test.Attributes["description"], "demo test")
+	assert.Equal(t, results[0].Test.Attributes["priority"], "P0")
 
 	parser, err = NewResultParser("./testdata/report_with_setup.json", "/data/workspace", "suites/demo", "", true)
 	assert.NoError(t, err)
