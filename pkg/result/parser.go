@@ -111,6 +111,7 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 		var labelList string
 		var owner string
 		var description string
+		var priority string
 		if labels := getLabels(spec.ContainerHierarchyLabels, spec.LeafNodeLabels); len(labels) > 0 {
 			if marshalLabelList, err := json.Marshal(labels); err == nil {
 				labelList = string(marshalLabelList)
@@ -121,6 +122,9 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 				}
 				if strings.HasPrefix(label, "description:") {
 					description = strings.TrimSpace(strings.TrimPrefix(label, "description:"))
+				}
+				if strings.HasPrefix(label, "priority:") {
+					priority = strings.TrimSpace(strings.TrimPrefix(label, "priority:"))
 				}
 			}
 		}
@@ -141,6 +145,7 @@ func (p *ResultParser) Parse() ([]*sdkModel.TestResult, error) {
 					"tags":                   labelList,
 					"owner":                  owner,
 					"description":            description,
+					"priority":               priority,
 					"testsolar_requests_key": spec.getSpecName(),
 				},
 			},
