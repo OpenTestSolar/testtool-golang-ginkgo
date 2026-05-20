@@ -29,6 +29,69 @@ func parseExtraArgs(extraArgs string) (*cmdpkg.CommandArgs, error) {
 	return cmdpkg.NewCmdArgsParseByCmdLine(extraArgs)
 }
 
+var ginkgoBinaryFlags = map[string]bool{
+	"always-emit-ginkgo-writer": true,
+	"dry-run":                   true,
+	"fail-fast":                 true,
+	"fail-on-empty":             true,
+	"fail-on-pending":           true,
+	"flake-attempts":            true,
+	"focus":                     true,
+	"focus-file":                true,
+	"force-newlines":            true,
+	"github-output":             true,
+	"gojson-report":             true,
+	"grace-period":              true,
+	"json-report":               true,
+	"junit-report":              true,
+	"label-filter":              true,
+	"no-color":                  true,
+	"output-interceptor-mode":   true,
+	"parallel.host":             true,
+	"parallel.process":          true,
+	"parallel.total":            true,
+	"poll-progress-after":       true,
+	"poll-progress-interval":    true,
+	"randomize-all":             true,
+	"randomize-suites":          true,
+	"sem-ver-filter":            true,
+	"seed":                      true,
+	"show-node-events":          true,
+	"silence-skips":             true,
+	"skip":                      true,
+	"skip-file":                 true,
+	"succinct":                  true,
+	"source-root":               true,
+	"teamcity-report":           true,
+	"timeout":                   true,
+	"trace":                     true,
+	"v":                         true,
+	"vv":                        true,
+}
+
+func convertExtraArgsForBinary(extraArgs string) string {
+	if extraArgs == "" {
+		return ""
+	}
+	cmdArgs, err := cmdpkg.NewCmdArgsParseByCmdLine(extraArgs)
+	if err != nil {
+		log.Printf("Parse extra args [%s] error: %v", extraArgs, err)
+		return extraArgs
+	}
+	for _, arg := range cmdArgs.Args {
+		if arg.Key == "" {
+			continue
+		}
+		if strings.HasPrefix(arg.Key, "--") && !strings.HasPrefix(arg.Key, "--ginkgo.") {
+			flagName := strings.TrimPrefix(arg.Key, "--")
+			if ginkgoBinaryFlags[flagName] {
+				arg.Key = "--ginkgo." + flagName
+			}
+		}
+	}
+	return cmdArgs.GenerateCmdLineStr()
+}
+
 func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNames []string, hasClient bool) string {
 	if hasClient {
 		defaultCmdLine := fmt.Sprintf("ginkgo --v --no-color --trace --json-report %s --output-dir %s --always-emit-ginkgo-writer", jsonFileName, projPath)
@@ -54,6 +117,7 @@ func genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin string, tcNam
 		cmdline := cmdArgs.GenerateCmdLineStr()
 		return cmdline
 	} else {
+		extraArgs = convertExtraArgsForBinary(extraArgs)
 		if extraArgs == "" {
 			return pkgBin + fmt.Sprintf(` --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report="%s" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus="%s"`, jsonFileName, cmdpkg.GenTestCaseFocusName(tcNames))
 		} else {

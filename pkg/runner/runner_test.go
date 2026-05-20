@@ -33,6 +33,10 @@ func TestGenarateCommandLine(t *testing.T) {
 	expected = "suite.test --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report=\"output.json\" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus=\"case01$|case02$\" --ginkgo.label-filter \"( label01||label02)\""
 	cmdline = genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin, tcNames, false)
 	assert.Equal(t, expected, cmdline, "should return the expected command line")
+	extraArgs = `--label-filter "( label01||label02)" --timeout 5h --procs 3`
+	expected = `suite.test --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report="output.json" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus="case01$|case02$" --ginkgo.label-filter "( label01||label02)" --ginkgo.timeout "5h" --procs "3"`
+	cmdline = genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin, tcNames, false)
+	assert.Equal(t, expected, cmdline, "should convert ginkgo flags to --ginkgo. prefix for binary")
 	extraArgs = ""
 	expected = "suite.test --ginkgo.v --ginkgo.no-color --ginkgo.trace --ginkgo.json-report=\"output.json\" --ginkgo.always-emit-ginkgo-writer --ginkgo.focus=\"case01$|case02$\""
 	cmdline = genarateCommandLine(extraArgs, jsonFileName, projPath, pkgBin, tcNames, false)
